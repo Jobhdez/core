@@ -1,0 +1,56 @@
+(in-package #:zetta)
+
+(deftype token ()
+  `(cons type val))
+
+(defun tok (type &optional val)
+  (cons type val))
+
+(alexa:define-string-lexer python-lexer
+    "Make a lexical analyzer for Python expressions."
+  ((:num "\\d+")
+   (:name "[A-Za-z][A-Za-z0-9_]*"))
+  ("and"      (return (tok :boolop (intern (string-upcase $@) 'keyword))))
+  ("or"       (return (tok :boolop (intern (string-upcase $@) 'keyword))))
+  ("not"      (return (tok :unaryop  (intern (string-upcase $@) 'keyword))))
+  ("\\("      (return (tok :left-paren)))
+  ("\\)"      (return (tok :right-paren)))
+  ("\\+"      (return (tok :plus (intern $@ 'keyword))))
+  ("\\-"      (return (tok :minus (intern $@ 'keyword))))
+  ("\\=="     (return (tok :cmp  (intern (string-upcase $@) 'keyword))))
+  ("\\!="     (return (tok :cmp  (intern $@ 'keyword))))
+  ("\\<"      (return (tok :cmp  (intern $@ 'keyword))))
+  ("\\<="     (return (tok :cmp  (intern $@ 'keyword))))
+  ("\\>"      (return (tok :cmp  (intern $@ 'keyword))))
+  ("\\>="     (return (tok :cmp  (intern $@ 'keyword))))
+  ("\\="      (return (tok :assignment)))
+  ("True"     (return (tok :bool  (intern (string-upcase $@) 'keyword))))
+  ("False"    (return (tok :bool  (intern (string-upcase $@) 'keyword))))
+  ("if"       (return (tok :if    (intern (string-upcase $@) 'keyword))))
+  ("else"     (return (tok :else (intern (string-upcase $@) 'keyword))))
+  ("while"    (return (tok :while (intern (string-upcase $@) 'keyword))))
+  ("print"    (return (tok :print (intern (string-upcase $@) "ZETTA-VAR"))))
+  ("\\:"      (return (tok :colon)))
+  ("{{NAME}}" (return (tok :name (intern (string-upcase $@) "ZETTA-VAR"))))
+  ("{{NUM}}"  (return (tok :constant (parse-integer $@))))
+  ("\\s+"    nil))
+
+(defun token-generator (toks)
+  (lambda ()
+    (if (null toks)
+	(values nil nil)
+	(let ((tok (pop toks)))
+	  (values (token-type tok)
+		  (token-value tok))))))
+
+(defun token-type (tok)
+  (car tok))
+
+(defun token-value (tok)
+  (cdr tok))
+
+(defun lex-line (string)
+  (loop :with lexer := (python-lexer string)
+	:for tok := (funcall lexer)
+	:while tok
+	:collect tok))
