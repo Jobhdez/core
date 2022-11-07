@@ -1,7 +1,9 @@
 (defpackage #:zetta
   (:use #:common-lisp
 	#:alexa
-	#:yacc))
+	#:yacc
+	#:trivia
+	#:alexandria))
 
 (defpackage #:zetta-var
   (:use))
