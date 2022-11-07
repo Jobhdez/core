@@ -46,9 +46,10 @@
 		 (temp-name (generate-temp-name "temp_"))
 		 (hash-value (gethash last-key *temp-names*)))
 	    (progn (remhash last-key *temp-names*)
-		   (make-atomic-assignment :temp-var temp-name
+		   (list (make-atomic-assignment :temp-var temp-name
 				           :n (make-atomic-sum :lexp hash-value
-						              :rexp e)))))
+						               :rexp e))
+			 (make-py-print :exp temp-name)))))
 	 (_ (error "no valid expression."))))
 
 (defvar gensym-count 0)
