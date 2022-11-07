@@ -15,9 +15,11 @@
   (if (listp (py-module-statements parse-tree))
       (flatten (mapcar (lambda (node) (remove-complex node)) (flatten (py-module-statements parse-tree))))))
 
+(defparameter *temp-names* (make-hash-table))
+
 (defun remove-complex (parse-node)
   "Given a parse tree node it removes the complex expression."
-  (defparameter *temp-names* (make-hash-table))
+  ;;(defparameter *temp-names* (make-hash-table))
   (match parse-node
 	 ((py-constant :num n)
 	  (make-py-constant :num n))
