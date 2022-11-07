@@ -2,7 +2,7 @@
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
 (defun build-module (statements)
-  (make-py-module :statements statements))
+  (make-py-module :statements (flatten statements)))
 
 (defun build-print (print-token left-paren-token exp right-paren-token)
   (declare (ignore print-token left-paren-token right-paren-token))
