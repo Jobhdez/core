@@ -11,4 +11,6 @@
 	      :components ((:file "lexer")))
      (:module "parser"
 	      :components ((:file "parser")
-			   (:file "ast")))))
+			   (:file "ast")))
+     (:module "passes"
+	      :components ((:file "remove-complex-operands")))))
