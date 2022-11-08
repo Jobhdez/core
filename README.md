@@ -58,7 +58,7 @@ then the `remove-complex-operands` pass generates
  #S(CALLQ :LABEL "print_int"))
  ```
  
- # Example 2
+ ## Example 2
  
  `52 + -10` =>
  
