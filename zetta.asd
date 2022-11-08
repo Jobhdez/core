@@ -13,4 +13,5 @@
 	      :components ((:file "parser")
 			   (:file "ast")))
      (:module "passes"
-	      :components ((:file "remove-complex-operands")))))
+	      :components ((:file "remove-complex-operands")
+			   (:file "select-instructions")))))
