@@ -54,13 +54,5 @@
 				  
 			   
 
-(defvar gensym2-count 0)
-
-(defun generate-temp-name2 (prefix-name)
-  (progn (setf gensym2-count (+ gensym-count 1))
-	 (concatenate 'string
-		      prefix-name
-		      (write-to-string gensym-count))))
-
 	  
 	 
