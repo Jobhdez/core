@@ -25,10 +25,24 @@
 	  (make-py-constant :num n))
 	 ((py-neg-num :num n)
 	  (make-atomic-assignment :temp-var (generate-temp-name "temp_")
-				  :n (make-neg-num :num n)))
+				  :n (make-py-neg-num :num n)))
 	 ((py-sum :lexp e1 :rexp e2)
-	  (make-atomic-sum :lexp (remove-complex e1)
-			   :rexp (remove-complex e2)))
+	  (if (and (py-constant-p e1) (py-constant-p e2))
+	      (list (make-py-sum :lexp e1 :rexp e2))
+	      (when (or (py-neg-num-p e2) (py-neg-num-p e1))
+		(cond ((py-neg-num-p e2)
+		       (let* ((rmv-complex (remove-complex e2))
+			      (tmp-var (atomic-assignment-temp-var rmv-complex)))
+			 (list rmv-complex
+		               (make-atomic-sum :lexp (remove-complex e1)
+			                        :rexp tmp-var))))
+		      ((py-neg-num-p e1)
+		       (let* ((rmv-complex (remove-complex e1))
+		              (tmp-var (atomic-assignment-temp-var rmv-complex)))
+			 (list rmv-complex
+			       (make-atomic-sum :lexp tmp-var
+			                        :rexp (remove-complex e2)))))))))
+		   
 	 ((py-assignment :name name
 			 :exp e)
 	  (let* ((temp-exp (get-temp-var e))
