@@ -8,6 +8,9 @@
   lexp
   rexp)
 
+(defstruct atomic-var
+  name)
+
 (defun remove-complex-operands (parse-tree)
   "Removes complex operands. Eg each subexpression of a binary-op needs to be
    a atomic expression which is an integer or variable. complex operations
@@ -24,7 +27,7 @@
 	 ((py-constant :num n)
 	  (make-py-constant :num n))
 	 ((py-neg-num :num n)
-	  (make-atomic-assignment :temp-var (generate-temp-name "temp_")
+	  (make-atomic-assignment :temp-var (make-atomic-var :name (generate-temp-name "temp_"))
 				  :n (make-py-neg-num :num n)))
 	 ((py-sum :lexp e1 :rexp e2)
 	  (if (and (py-constant-p e1) (py-constant-p e2))
@@ -47,7 +50,7 @@
 			 :exp e)
 	  (let* ((temp-exp (get-temp-var e))
 		 (atomic (get-atomic e))
-		 (atomic-exp1 (make-py-assignment :name name
+		 (atomic-exp1 (make-py-assignment :name (make-atomic-var :name name)
 						  :exp (make-atomic-sum :lexp atomic
 									:rexp (atomic-assignment-temp-var temp-exp))))
 		 (temp-name (generate-temp-name "temp_")))
@@ -60,10 +63,10 @@
 		 (temp-name (generate-temp-name "temp_"))
 		 (hash-value (gethash last-key *temp-names*)))
 	    (progn (remhash last-key *temp-names*)
-		   (list (make-atomic-assignment :temp-var temp-name
-				           :n (make-atomic-sum :lexp hash-value
+		   (list (make-atomic-assignment :temp-var (make-atomic-var :name temp-name)
+				           :n (make-atomic-sum :lexp (make-atomic-var :name hash-value)
 						               :rexp e))
-			 (make-py-print :exp temp-name)))))
+			 (make-py-print :exp (make-atomic-var :name temp-name))))))
 	 (_ (error "no valid expression."))))
 
 (defvar gensym-count 0)
@@ -80,9 +83,9 @@
 	  (when (or (py-neg-num-p e)
 		    (py-neg-num-p e2))
 	    (if (py-neg-num-p e)
-		(make-atomic-assignment :temp-var (generate-temp-name "temp_")
+		(make-atomic-assignment :temp-var (make-atomic-var :name (generate-temp-name "temp_"))
 					:n e)
-		(make-atomic-assignment :temp-var (generate-temp-name "temp_")
+		(make-atomic-assignment :temp-var (make-atomic-var :name (generate-temp-name "temp_"))
 					:n e2))))))
 
 (defun get-atomic (exp-node)
