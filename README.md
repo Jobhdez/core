@@ -11,7 +11,7 @@ Work in progress
 graph TD;
     Source-Program-->Parse-Tree;
     Parse-Tree-->Remove-Complex-Operands;
-    Remove-Complex-Operands-->Select-Instructions;
-    Select-Instructions-->x86-64;
+    Remove-Complex-Operands-->Instruction-Selection;
+    Instruction-Selection-->x86-64;
 ```
 
