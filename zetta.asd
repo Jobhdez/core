@@ -14,4 +14,5 @@
 			   (:file "ast")))
      (:module "passes"
 	      :components ((:file "remove-complex-operands")
-			   (:file "select-instructions")))))
+			   (:file "select-instructions")
+			   (:file "assign-homes")))))
