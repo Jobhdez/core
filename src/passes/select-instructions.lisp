@@ -76,7 +76,7 @@
 				      :arg2 tmp-var)
 		    (make-instruction :name "negq"
 				      :arg1 tmp-var
-				      :arg2 'no-sec-arg)
+				      :arg2 'no-arg)
 		    (make-instruction :name "movq"
 				      :arg1 tmp-var
 				      :arg2 (gethash "%rax" *registers*)))))))
