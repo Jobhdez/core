@@ -1,0 +1,161 @@
+use cases
+----------
+1. 10 + 2
+
+3. 10 - 3
+
+5. x = 1
+   y = 2
+   z = x + y
+   print(z)
+
+
+6. x = 50 + -10
+   print(x)
+
+7. x = 50 + -10
+   print(x + 10)
+
+8. 50 + -10
+
+9. 50 + -10 + -4
+
+10. x = 50 + 30 + -10
+    y = 30 + -10
+    z = x + y
+    print(z + 13)
+
+thoughts
+------------
+how do i design my system such that it *guarantees* that a valid expreesion
+gets compiled correctly to x86?
+
+easy to understand
+ready for change
+safe from bugs
+
+
+
+example 1
+x = 50 + -10
+print(x)
+|
+V
+temp_0 = -10
+x = 50 + temp_0
+print(x)
+|
+V
+pushq %rbp
+movq %rsp, %rbp
+subq $16, %rbp
+movq $10, temp_0
+subq temp_0
+movq %50, x
+addq temp_0, x
+movq x, %rdi
+callq print_int
+|
+V
+pushq %rbp
+movq %rsp, %rbp
+subq $16, %rbp
+movq $10, -8(%rsp)
+subq -8(%rsp)
+movq $50 -16(%rsp)
+addq -8(%rsp) -16(%rsp)
+movq -16(%rsp) %rdi
+callq print_int
+addq %16, %rsp
+popq %rbp
+retq
+|
+V
+pushq %rbp
+movq %rsp, %rbp
+subq $16, %rbp
+movq %10, -8(%rsp)
+movq -8(%rsp)
+movq $50 -16(%rsp)
+addq -8(%rsp) %rax
+addq %rax, -16(%rsp)
+movq -16(%rsp) %rdi
+callq print_int
+addq %16, %rsp
+popq %rbp
+retq
+-----------------------
+
+example2
+------------
+
+x = 50 + -10
+print(x + 10)
+
+    |
+    |
+remove-complex-operands
+    |
+    V
+temp_0 = -10
+x = 50 + temp_0
+temp_1 = x + 10
+print(temp_1)
+
+    |
+  instruction selection
+    |
+    V
+pushq %rbp
+movq %rsp, %rbp
+subq $32, %rbp
+movq $10, temp_0
+subq temp_0
+movq $50, x
+addq temp_0, x
+movq 10, temp_1
+addq x, temp_1
+callq print_int
+addq %16, %rsp
+popq %rbp
+retq
+
+|
+assign homes
+|
+V
+pushq %rbp
+movq %rsp, %rbp
+subq $32, %rbp
+movq $10, -8(%rsp)
+subq -8(%rsp)
+movq $50, -16(%rsp)
+addq -8(%rsp) -16(%rsp)
+movq 10, -24(%rsp)
+addq -16(%rsp) -24(%rsp)
+callq print_int
+addq %32, %rsp
+popq %rbp
+retq
+
+|
+|
+patch-instructions
+|
+V
+pushq %rbp
+movq %rsp, %rbp
+subq $32, %rbp
+movq $10, -8(%rsp)
+subq -8(%rsp)
+movq $50, -16(%rsp)
+addq -8(%rsp), %rax
+movq %rax, -16(%rsp)
+movq 10, -24(%rsp)
+addq -16(%rsp), %rax
+movq %rax, -24(%rsp)
+callq print_int
+addq %32, %rsp
+popq %rbp
+retq
+
