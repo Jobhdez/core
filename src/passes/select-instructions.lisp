@@ -29,25 +29,42 @@
 
 (defun select-instrs (node)
   (match node
-	 ((py-assignment :name n
+	 ((py-assignment :name var-name
 			 :exp e1)
-	  (if (atomic-sum-p e1)
-	      (let* ((tmp-var (atomic-sum-rexp e1))
+	  (cond ((atomic-sum-p e1)
+		 (let* ((tmp-var (atomic-sum-rexp e1)))
+		     "
 		    (hash-values (hash-table-values *expressions*))
 		    (hash-keys (hash-table-keys *expressions*))
-		    (last-key (car (last hash-keys))))
-		     
-		(list (make-instruction :name "movq"
-				        :arg1 (make-immediate :int (py-constant-num
+		    (last-key (car (last hash-keys))))"
+		     (list (make-instruction :name "movq"
+				             :arg1 (make-immediate :int (py-constant-num
 							    (atomic-sum-lexp e1)))
-				        :arg2 n)
-		      (if (equalp 'py-neg-num last-key)
-			  (make-instruction :name "addq"
-				        :arg1 n
-				        :arg2 (gethash "%rax" *registers*))
-			  (make-instruction :name "addq"
-					    :arg1 tmp-var
-					    :arg2 n))))))
+				             :arg2 var-name)
+		           (make-instruction :name "addq"
+					     :arg1 tmp-var
+					     :arg2 var-name))))
+		((py-constant-p  e1)
+		 (make-instruction :name "movq"
+				   :arg1 e1
+				   :arg2 var-name))
+
+		((py-sum-p e1)
+		  (let* ((tmp-var (py-sum-rexp e1)))
+		     "
+		    (hash-values (hash-table-values *expressions*))
+		    (hash-keys (hash-table-keys *expressions*))
+		    (last-key (car (last hash-keys))))"
+		     (list (make-instruction :name "movq"
+				             :arg1 (py-sum-lexp e1)
+				             :arg2 var-name)
+		           (make-instruction :name "addq"
+					     :arg1 (py-sum-rexp e1)
+					     :arg2 var-name))))
+
+		(t (error "Not valid PY-ASSIGNMENT."))))
+		 
+		 
 				
 						 
 						 
@@ -56,43 +73,34 @@
 			     :n n)
 	  (cond ((atomic-sum-p n)
 	      (let ((vari (atomic-sum-lexp n))
-		    (rexp (py-constant-num (py-sum-rexp (atomic-sum-rexp n)))))
+		    (rexp (py-constant-num (atomic-sum-rexp n))))
 		(list (make-instruction :name "movq"
-					:arg1 (if (equalp 'py-neg-num (gethash 'py-neg-num *expressions*))
-						  "%rax"
-						  vari)
-				 :arg2 tmp)
+					:arg1 rexp
+				         :arg2 tmp)
 		      (make-instruction :name "addq"
-					:arg1 (make-immediate :int rexp)
+					:arg1 vari
 					:arg2 tmp))))
 		((py-neg-num-p n)
+		 
 		 (let* ((num (py-constant-num (py-neg-num-num n)))
 			(tmp-var tmp))
-		   (setf (gethash "%rax" *registers*) "%rax")
-		   (setf (gethash 'py-neg-num *expressions*) 'py-neg-num)
+		   ;(setf (gethash "%rax" *registers*) "%rax")
+		   ;(setf (gethash 'py-neg-num *expressions*) 'py-neg-num)
 		   (list
 		    (make-instruction :name "movq"
 				      :arg1 num
 				      :arg2 tmp-var)
 		    (make-instruction :name "negq"
 				      :arg1 tmp-var
-				      :arg2 'no-arg)
-		    (make-instruction :name "movq"
-				      :arg1 tmp-var
-				      :arg2 (gethash "%rax" *registers*)))))))
+				      :arg2 'no-arg))))))
 	 ((py-print :exp e1)
-	  (let* ((hash-values (hash-table-values *expressions*))
-	      	 (hash-keys (hash-table-keys *expressions*))
-		 (last-key (car (last hash-keys))))
-	    (list (if (equalp 'py-neg-num last-key)
-		      (make-instruction :name "movq"
-				  :arg1 "%rax"
-				  :arg2 "%rdi")
-		      (make-instruction :name "movq"
-					:arg1 e1
-					:arg2 "%rdi"))
-		
-		(make-callq :label "print_int"))))
+	  (if (or (py-var-p e1) (atomic-var-p e1))
+	      (list (make-instruction :name "movq"
+				      :arg1 (if (py-var-p e1) (py-var-name e1) (atomic-var-name e1))
+				      :arg2 "%rdi")
+		    (make-callq :label "print_int"))))
+		 
+	  
 	 ((atomic-sum :lexp e1 :rexp e2)
 	  (cond ((py-constant-p e1)
 		 
@@ -108,10 +116,3 @@
 					   :arg1 'no-arg
 					   :arg2 'no-arg))))
 		(t (error "E1 isnt a constant."))))))
-		
-		   
-				  
-			   
-
-	  
-	 

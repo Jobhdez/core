@@ -48,26 +48,84 @@
 		   
 	 ((py-assignment :name name
 			 :exp e)
-	  (let* ((temp-exp (get-temp-var e))
-		 (atomic (get-atomic e))
-		 (atomic-exp1 (make-py-assignment :name (make-atomic-var :name name)
-						  :exp (make-atomic-sum :lexp atomic
-									:rexp (atomic-assignment-temp-var temp-exp))))
-		 (temp-name (generate-temp-name "temp_")))
-	    (setf (gethash name *temp-names*) name)
-	    (list temp-exp atomic-exp1)))
-	 ((py-print :exp e)
-	  (let* ((hash-values (hash-table-values *temp-names*))
-		(hash-keys   (hash-table-keys *temp-names*))
-		 (last-key (car (last hash-keys)))
-		 (temp-name (generate-temp-name "temp_"))
-		 (hash-value (gethash last-key *temp-names*)))
-	    (progn (remhash last-key *temp-names*)
-		   (list (make-atomic-assignment :temp-var (make-atomic-var :name temp-name)
-				           :n (make-atomic-sum :lexp (make-atomic-var :name hash-value)
-						               :rexp e))
-			 (make-py-print :exp (make-atomic-var :name temp-name))))))
-	 (_ (error "no valid expression."))))
+	  (cond ((py-constant-p e)
+		 (make-py-assignment :name (make-atomic-var :name name)
+				     :exp e))
+		((py-sum-p e)
+		 (cond ((positive-sum-p e)
+			e)
+		       
+		       ((variable-sum-p e)
+			(make-py-assignment :name (make-atomic-var :name name) :exp e))
+		       
+		       ((negative-sum-p e)
+			(let* ((temp-exp (get-temp-var e))
+		               (atomic (get-atomic e))
+		               (atomic-exp1 (make-py-assignment :name (make-atomic-var :name name)
+						                :exp (make-atomic-sum :lexp atomic
+									              :rexp
+										      (atomic-assignment-temp-var
+										       temp-exp))))
+			       (temp-name (generate-temp-name "temp_")))
+			  (setf (gethash name *temp-names*) name)
+	                  (list temp-exp atomic-exp1)))
+		       (t (error "No more valid sum expressions."))))
+
+		((py-constant-p e)
+		 e)))
+		
+	  ((py-print :exp e)
+	   (cond ((py-var-p e)
+		  (let ((e* (make-py-var :name (make-atomic-var :name (py-var-name e)))))
+		    (make-py-print :exp e*)))
+		 
+		 ((var-num-sum-p e)
+		  (let* ((temp-name (generate-temp-name "temp_"))
+		         (var-name (py-sum-lexp e))
+		         (num (py-sum-rexp e)))
+		    (list (make-atomic-assignment :temp-var (make-atomic-var :name temp-name)
+				                  :n (make-atomic-sum :lexp (make-atomic-var :name var-name)
+						                      :rexp num))
+			  (make-py-print :exp (make-atomic-var :name temp-name)))))
+
+		 (t (error "No other print expressions."))))
+	  (_ (error "no valid expression."))))
+
+(defun positive-sum-p (node)
+  "Checks whether NODE is a sum expression composed of positive numbers."
+  (match node
+	 ((py-sum :lexp e1 :rexp e2)
+	  (if (and (py-constant-p e1)
+		   (py-constant-p e2))
+	      t
+	      nil))))
+
+(defun variable-sum-p (node)
+  "Checks whether NODE is a sum expression composed of variables. eg y + z"
+  (match node
+	 ((py-sum :lexp e :rexp e2)
+	  (if (and (py-var-p e)
+		   (py-var-p e2))
+	      t
+	      nil))))
+
+(defun negative-sum-p (node)
+  "checks if NODE is a sum expression composed of a positive and negative number. eg 10 + -3"
+  (match node
+	 ((py-sum :lexp e :rexp e2)
+	  (if (and (py-constant-p e)
+		   (py-neg-num-p e2))
+	      t
+	      nil))))
+
+(defun var-num-sum-p (node)
+  "checks if node is a sum expression composed of a constant and variable. eg x + 10"
+  (match node
+	 ((py-sum :lexp e :rexp e2)
+	  (if (and (py-var-p e)
+		   (py-constant-p e2))
+	      t
+	      nil))))
 
 (defvar gensym-count 0)
 
