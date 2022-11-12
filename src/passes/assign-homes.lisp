@@ -6,6 +6,10 @@
 
 (defun assign-homes (instructions)
   (mapcar (lambda (instr) (assignh instr)) instructions))
+					 
+		     
+		 
+		
 
 (defun assignh (instr)
   (match instr
@@ -61,12 +65,23 @@
 		     (progn (assign-stack instr)
 			    (make-instruction :name n
 					      :arg1 a1
-					      :arg2 (gethash a2 *varnames*))))))))
+					      :arg2 (gethash a2 *varnames*))))))
+
+		((and (atomic-var-p a1)
+		      (stringp a2))
+		 (if (gethash a1 *varnames*)
+		     (make-instruction :name n
+				       :arg1 (gethash a1 *varnames*)
+				       :arg2 a2)
+		     (progn (assign-stack instr)
+			    (make-instruction :name n
+				       :arg1 (gethash a1 *varnames*)
+				       :arg2 a2))))
 		
 		
 	 ((callq :label l)
 	  (make-callq :label l))
-	 (_ (error "Instruction is not valid."))))
+	 (_ (error "Instruction is not valid."))))))
 	        
 
 (defun assign-stack (instr)
@@ -96,6 +111,12 @@
 		((and (atomic-var-p a2) (numberp a1))
 		 (setf *variable* (* *variable* 2))
 		 (setf (gethash a2 *varnames*)
+		       (concatenate 'string "-" (write-to-string *variable*) "(%rbp)")))
+
+		((and (atomic-var-p a1)
+		      (stringp a2))
+		 (setf *variable* (* *variable* 2))
+		 (setf (gethash a1 *varnames*)
 		       (concatenate 'string "-" (write-to-string *variable*) "(%rbp)")))))))
 
 	
