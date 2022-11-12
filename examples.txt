@@ -158,4 +158,41 @@ callq print_int
 addq %32, %rsp
 popq %rbp
 retq
+----------
+example 3
+------------
+x = 10 + -3
+y = 2
+z = x + y
+print(z)
+|
+|
+remove-complex-operands
+|
+V
+temp_0 = -3
+x = 10 + temp_0
+y = 2
+z = x + y
+print(z)
+|
+|
+select-instructions
+|
+V
+pushq %rbp
+movq %rsp, %rbp
+subq $32, %rbp
+movq $3, temp_0
+negq temp_0
+movq 10, x
+addq temp_0, x
+movq 2 y
+movq y z
+addq x z
+callq print_int
+addq %32, %rsp
+popq %rbp
+retq
+
 
