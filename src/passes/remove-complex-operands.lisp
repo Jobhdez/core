@@ -17,6 +17,11 @@
   begin-else
   condition)
 
+(defstruct while-atomic
+  loop-block
+  test-block
+  pre-block)
+
 (defun remove-complex-operands (parse-tree)
   "Removes complex operands. Eg each subexpression of a binary-op needs to be
    a atomic expression which is an integer or variable. complex operations
@@ -57,6 +62,10 @@
 	  (cond ((py-constant-p e)
 		 (make-py-assignment :name (make-atomic-var :name name)
 				     :exp e))
+		((py-sub-p e)
+		 (make-py-assignment :name (make-atomic-var :name name)
+				     :exp e))
+		
 		((py-sum-p e)
 		 (cond ((positive-sum-p e)
 			e)
@@ -100,6 +109,16 @@
 			   :begin-then (flatten (mapcar (lambda (instr) (remove-complex instr)) ifs))
 			   :begin-else (flatten (mapcar (lambda (instr) (remove-complex instr)) els))
 			   :condition e))
+
+	  ((py-while :prestatements pres
+		     :exp e1
+		     :body-statements body)
+	   (make-while-atomic :loop-block (mapcar (lambda (n) (remove-complex n)) body)
+			      :test-block e1
+			      :pre-block (mapcar (lambda (n) (remove-complex n))
+						 (if (listp pres)
+						     pres
+						     (list pres)))))
 	  (_ (error "no valid expression."))))
 
 (defun positive-sum-p (node)
