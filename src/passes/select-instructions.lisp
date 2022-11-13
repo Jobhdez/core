@@ -115,4 +115,29 @@
 			 (make-instruction :name "retq"
 					   :arg1 'no-arg
 					   :arg2 'no-arg))))
-		(t (error "E1 isnt a constant."))))))
+		(t (error "E1 isnt a constant."))))
+	 ((if-atomic :block b1 :begin-then bthen :begin-else bels :condition e)
+	  (let* ((set-instrs1 (mapcar (lambda (instr) (select-instrs instr))
+				      bthen))
+		 (set-instrs2 (mapcar (lambda (instr) (select-instrs instr))
+				     bels))
+		 (conditional (select-instrs e)))
+	    (list conditional
+		  (make-instruction :name "je" :arg1 b1 :arg2 'no-arg)
+		  set-instrs1
+		  b1
+		  set-instrs2)))
+	 ((py-cmp :lexp e1 :cmp compare :rexp e2)
+	  (if (equalp "==" (string-upcase compare))
+	      (list (make-instruction :name "movq"
+				      :arg1 (make-immediate :int (py-constant-num e1))
+				      :arg2 "%rsi")
+		    (make-instruction :name "movq"
+				      :arg1 (make-immediate :int (py-constant-num e2))
+				      :arg2 "%rdi")
+		    (make-instruction :name "cmpq"
+				      :arg1 "%rsi"
+				      :arg2 "%rdi"))))))
+		    
+		  
+	  

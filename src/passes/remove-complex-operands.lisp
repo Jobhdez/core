@@ -11,6 +11,12 @@
 (defstruct atomic-var
   name)
 
+(defstruct if-atomic
+  block
+  begin-then
+  begin-else
+  condition)
+
 (defun remove-complex-operands (parse-tree)
   "Removes complex operands. Eg each subexpression of a binary-op needs to be
    a atomic expression which is an integer or variable. complex operations
@@ -89,6 +95,11 @@
 			  (make-py-print :exp (make-atomic-var :name temp-name)))))
 
 		 (t (error "No other print expressions."))))
+	  ((py-if :exp e :if-statement ifs :else-statement els)
+	   (make-if-atomic :block "block_1"
+			   :begin-then (flatten (mapcar (lambda (instr) (remove-complex instr)) ifs))
+			   :begin-else (flatten (mapcar (lambda (instr) (remove-complex instr)) els))
+			   :condition e))
 	  (_ (error "no valid expression."))))
 
 (defun positive-sum-p (node)
