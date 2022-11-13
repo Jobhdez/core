@@ -62,6 +62,16 @@
 					     :arg1 (py-sum-rexp e1)
 					     :arg2 var-name))))
 
+		((py-sub-p e1)
+		 (let ((var (py-sub-lexp e1)))
+		   (if (py-var-p var)
+		       (if (equalp (py-var-name var)
+				   (atomic-var-name var-name))
+			   (list (make-instruction :name "subq"
+						   :arg1 "$1"
+						   :arg2 var-name))))))
+		 
+
 		(t (error "Not valid PY-ASSIGNMENT."))))
 		 
 		 
@@ -127,8 +137,20 @@
 		  set-instrs1
 		  b1
 		  set-instrs2)))
+	 ((while-atomic :loop-block loopb :test-block testb :pre-block preb)
+	  (let ((setloopb (mapcar (lambda (n) (select-instrs n)) (if (listp loopb) loopb (list loopb))))
+		(settestb (mapcar (lambda (n) (select-instrs n)) (if (listp testb) testb (list testb))))
+		(setpreb (mapcar (lambda (n) (select-instrs n)) (if (listp preb) preb (list preb)))))
+	    (list setpreb
+		  (make-instruction :name "jmp" :arg1 "test" :arg2 'no-arg)
+		  "loop:"
+		  setloopb
+		  "test:"
+		  settestb
+		  (make-instruction :name "jg" :arg1 "loop" :arg2 'no-arg))))
+	  
 	 ((py-cmp :lexp e1 :cmp compare :rexp e2)
-	  (if (equalp "==" (string-upcase compare))
+	  (cond ((equalp "==" (string-upcase compare))
 	      (list (make-instruction :name "movq"
 				      :arg1 (make-immediate :int (py-constant-num e1))
 				      :arg2 "%rsi")
@@ -137,7 +159,12 @@
 				      :arg2 "%rdi")
 		    (make-instruction :name "cmpq"
 				      :arg1 "%rsi"
-				      :arg2 "%rdi"))))))
+				      :arg2 "%rdi")))
+		((equalp ">" (string-upcase compare))
+		 (if (equalp 1 (py-constant-num e2))
+		     (list (make-instruction :name "cmpq"
+					 :arg1 "$1"
+					 :arg2 (if (py-var-p e1) (make-atomic-var :name (py-var-name e1)) e1)))))))))	 
 		    
 		  
 	  
