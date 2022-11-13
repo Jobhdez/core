@@ -96,7 +96,7 @@
 	 ((py-print :exp e1)
 	  (if (or (py-var-p e1) (atomic-var-p e1))
 	      (list (make-instruction :name "movq"
-				      :arg1 (if (py-var-p e1) (py-var-name e1) (atomic-var-name e1))
+				      :arg1 (if (py-var-p e1) (py-var-name e1) e1)
 				      :arg2 "%rdi")
 		    (make-callq :label "print_int"))))
 		 
