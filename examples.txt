@@ -257,3 +257,12 @@ movq 3 y
 addq temp_2 y
 movq y %rdi
 callq print_int
+
+
+----------
+example while loop
+
+x = 8
+while x > 1:
+   print(x)
+   x = x - 1
