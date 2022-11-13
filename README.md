@@ -1,7 +1,7 @@
 # zettapy
 `Zettapy` is a small toy compiler for the core of imperative languages (i.e., loops, if statements, variables, assignment). It attempts to emit x86-64. so far variables, and assignment -- e.g., `x = 50 + -30 print(x + 10)` compiles to assembly instructions in which the variables are in registers or stack locations. But the stack locations are a bit off; I believe the instructions are mostly correct but the stack locations are off by a bit and since I use global variables the stack locations are off by a lot in subsequent runs of the program. With respect to `while loops` and `if statements` -- these get compiled to instructions via the `instruction selection` module so that means that there is no mention of registers or the stack in these instructions, but nevertheles, the structure of the assembly is there.
 
-This compiler was done for fun and to learn about assembly and low level details. Thanks to this project now I have a rough idea of how the assembly looks for the constructs that I implemented. I
+This compiler was done for fun and to learn about assembly and low level details. Thanks to this project now I have a rough idea of how the assembly looks for the constructs that I implemented. 
 
 Although, there are no tests I tested my code as I wrote it. You can see the examples that run in the `examples.txt` file.
 
