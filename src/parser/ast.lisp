@@ -7,8 +7,9 @@
   exp)
 
 (defstruct py-while
+  prestatements
   exp
-  statements)
+  body-statements)
 
 (defstruct py-if
   exp
