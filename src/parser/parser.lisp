@@ -66,7 +66,7 @@
    exp
    assignment
    (:while exp :colon statements #'build-while)
-   (:if exp :colon statement :else :colon statement #'build-if))
+   (:if exp :colon statements :else :colon statements #'build-if))
   (exp
    variable
    int
