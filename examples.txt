@@ -50,7 +50,7 @@ pushq %rbp
 movq %rsp, %rbp
 subq $16, %rbp
 movq $10, temp_0
-subq temp_0
+negq temp_0
 movq %50, x
 addq temp_0, x
 movq x, %rdi
@@ -61,7 +61,7 @@ pushq %rbp
 movq %rsp, %rbp
 subq $16, %rbp
 movq $10, -8(%rsp)
-subq -8(%rsp)
+negq -8(%rsp)
 movq $50 -16(%rsp)
 addq -8(%rsp) -16(%rsp)
 movq -16(%rsp) %rdi
@@ -75,7 +75,7 @@ pushq %rbp
 movq %rsp, %rbp
 subq $16, %rbp
 movq %10, -8(%rsp)
-movq -8(%rsp)
+negq -8(%rsp)
 movq $50 -16(%rsp)
 addq -8(%rsp) %rax
 addq %rax, -16(%rsp)
@@ -110,7 +110,7 @@ pushq %rbp
 movq %rsp, %rbp
 subq $32, %rbp
 movq $10, temp_0
-subq temp_0
+negq temp_0
 movq $50, x
 addq temp_0, x
 movq 10, temp_1
@@ -128,7 +128,7 @@ pushq %rbp
 movq %rsp, %rbp
 subq $32, %rbp
 movq $10, -8(%rsp)
-subq -8(%rsp)
+negq -8(%rsp)
 movq $50, -16(%rsp)
 addq -8(%rsp) -16(%rsp)
 movq 10, -24(%rsp)
@@ -147,7 +147,7 @@ pushq %rbp
 movq %rsp, %rbp
 subq $32, %rbp
 movq $10, -8(%rsp)
-subq -8(%rsp)
+negq -8(%rsp)
 movq $50, -16(%rsp)
 addq -8(%rsp), %rax
 movq %rax, -16(%rsp)
@@ -190,6 +190,28 @@ addq temp_0, x
 movq 2 y
 movq y z
 addq x z
+movq z, %rdi
+callq print_int
+addq %32, %rsp
+popq %rbp
+retq
+
+|
+assign-homes
+|
+V
+
+pushq %rbp
+movq %rsp, %rbp
+subq $32, %rbp
+movq $3, -8(%rbp)
+negq -8(%rbp)
+movq 10, -16(%rbp)
+addq -8(%rbp) -16(%rbp)
+movq 2 -32(%rbp)
+movq -32(%rbp) -64(%rbp)
+addq -16(%rbp) -64(%rbp)
+movq -64(%rbp) %rdi
 callq print_int
 addq %32, %rsp
 popq %rbp
