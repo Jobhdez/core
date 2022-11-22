@@ -6,6 +6,11 @@
 (defstruct py-print
   exp)
 
+(defstruct py-function
+  name
+  args
+  statements)
+
 (defstruct py-while
   prestatements
   exp

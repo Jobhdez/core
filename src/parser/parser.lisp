@@ -50,9 +50,15 @@
 (defun build-int (num)
   (make-py-constant :num num))
 
+(defun build-function (fun-tok var lparen-tok args r-paren colon-tok statements)
+  (declare (ignore fun-tok lparen-tok r-paren colon-tok))
+  (make-py-function :name var
+		    :args args
+		    :statements statements))
+
 (define-parser *python-grammar*
     (:start-symbol module)
-  (:terminals (:boolop :unaryop :cmp :bool :assignment :if :else :while :colon :name :constant :right-paren :left-paren :print :plus :minus))
+  (:terminals (:boolop :unaryop :cmp :bool :assignment :if :else :while :colon :name :constant :right-paren :left-paren :print :plus :minus :fun))
   (module
    (statements #'build-module))
   (statements
@@ -63,10 +69,13 @@
   (statement
    (:print :left-paren :right-paren)
    (:print :left-paren exp :right-paren #'build-print)
+   function
    exp
    assignment
    (statements :while exp :colon statements #'build-while)
    (:if exp :colon statements :else :colon statements #'build-if))
+  (function
+   (:fun variable :left-paren args :right-paren :colon statements #'build-function))
   (exp
    variable
    int
@@ -77,6 +86,9 @@
    (exp :boolop exp #'build-bool-op)
    (:unaryop exp #'build-unaryop)
    (exp :cmp exp #'build-cmp))
+  (args
+   variable
+   (variable args))
   (variable
    (:name #'build-variable))
   (assignment

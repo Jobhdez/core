@@ -30,6 +30,7 @@
   ("else"     (return (tok :else (intern (string-upcase $@) 'keyword))))
   ("while"    (return (tok :while (intern (string-upcase $@) 'keyword))))
   ("print"    (return (tok :print (intern (string-upcase $@) "ZETTA-VAR"))))
+  ("fun"      (return (tok :fun (intern (string-upcase $@) "ZETTA-VAR"))))
   ("\\:"      (return (tok :colon)))
   ("{{NAME}}" (return (tok :name (intern (string-upcase $@) "ZETTA-VAR"))))
   ("{{NUM}}"  (return (tok :constant (parse-integer $@))))
