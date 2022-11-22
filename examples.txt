@@ -266,3 +266,22 @@ x = 8
 while x > 1:
    print(x)
    x = x - 1
+
+-----
+example function
+
+def sum(i)
+   print(i + 1)
+
+sum(3)
+   |
+   V
+movq $3, %rdi
+call sum
+
+sum:
+
+addq 1 rdi
+movq rdi rax
+callq print_int
+ret
