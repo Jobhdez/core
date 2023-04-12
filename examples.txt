@@ -1,3 +1,7 @@
+Here are some examples of correct generated assembly for a few python
+Programs https://github.com/Jobhdez/the-little-schemer/tree/main/x86-64/pycompiler_generated_assembly
+
+The following examples are just a rough idea of the generated assembly but I think the following examples are close enough.
 use cases
 ----------
 1. 10 + 2
