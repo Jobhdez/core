@@ -15,7 +15,7 @@ Although, there are no tests I tested my code as I wrote it. You can see the exa
 **Install**:
 `git clone git@github.com:Jobhdez/zettapy.git`
 
-Note: clone this project in `quicklisp/local-projects` so you can load the project with `(ql:quickload :yotta)`.
+Note: clone this project in `quicklisp/local-projects` so you can load the project with `(ql:quickload :zetta)`.
 
 **Use**:
 ```
