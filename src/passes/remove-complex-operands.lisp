@@ -32,14 +32,21 @@
 (defparameter *temp-names* (make-hash-table))
 
 (defun remove-complex (parse-node)
-  "Given a parse tree node it removes the complex expression."
-  ;;(defparameter *temp-names* (make-hash-table))
+  "Given a parse tree node it removes the complex expression.
+   theres three types of assignment:
+
+        1. x = 10 + -3
+        2. y = 2
+        3. z = x + y"
+  
   (match parse-node
 	 ((py-constant :num n)
 	  (make-py-constant :num n))
+	 
 	 ((py-neg-num :num n)
 	  (make-atomic-assignment :temp-var (make-atomic-var :name (generate-temp-name "temp_"))
 				  :n (make-py-neg-num :num n)))
+	 
 	 ((py-sum :lexp e1 :rexp e2)
 	  (if (and (py-constant-p e1) (py-constant-p e2))
 	      (list (make-py-sum :lexp e1 :rexp e2))
