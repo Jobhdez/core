@@ -1,7 +1,7 @@
 (in-package #:zetta)
 
-(defparameter *registers* (make-hash-table :test 'equal))
-(defparameter *expressions* (make-hash-table))
+;(defparameter *registers* (make-hash-table :test 'equal))
+;(defparameter *expressions* (make-hash-table))
 
 (defstruct immediate
   int)
@@ -25,18 +25,13 @@
 (defun select-instructions (ast)
   (flatten (mapcar (lambda (n) (select-instrs n)) ast)))
 
-
-
+  
 (defun select-instrs (node)
   (match node
 	 ((py-assignment :name var-name
 			 :exp e1)
 	  (cond ((atomic-sum-p e1)
-		 (let* ((tmp-var (atomic-sum-rexp e1)))
-		     "
-		    (hash-values (hash-table-values *expressions*))
-		    (hash-keys (hash-table-keys *expressions*))
-		    (last-key (car (last hash-keys))))"
+		 (let ((tmp-var (atomic-sum-rexp e1)))
 		     (list (make-instruction :name "movq"
 				             :arg1 (make-immediate :int (py-constant-num
 							    (atomic-sum-lexp e1)))
@@ -50,11 +45,7 @@
 				   :arg2 var-name))
 
 		((py-sum-p e1)
-		  (let* ((tmp-var (py-sum-rexp e1)))
-		     "
-		    (hash-values (hash-table-values *expressions*))
-		    (hash-keys (hash-table-keys *expressions*))
-		    (last-key (car (last hash-keys))))"
+		  (let ((tmp-var (py-sum-rexp e1)))
 		     (list (make-instruction :name "movq"
 				             :arg1 (py-sum-lexp e1)
 				             :arg2 var-name)
@@ -72,12 +63,7 @@
 						   :arg2 var-name))))))
 		 
 
-		(t (error "Not valid PY-ASSIGNMENT."))))
-		 
-		 
-				
-						 
-						 
+		(t (error "Not valid PY-ASSIGNMENT."))))					 
 		        
 	 ((atomic-assignment :temp-var tmp
 			     :n n)
@@ -100,32 +86,24 @@
 		    (make-instruction :name "movq"
 				      :arg1 num
 				      :arg2 tmp-var)
-		    (make-instruction :name "negq"
+		    (make-instruction :name "subq"
 				      :arg1 tmp-var
 				      :arg2 'no-arg))))))
 	 ((py-print :exp e1)
 	  (if (or (py-var-p e1) (atomic-var-p e1))
-	      (list (make-instruction :name "movq"
-				      :arg1 (if (py-var-p e1) (py-var-name e1) e1)
-				      :arg2 "%rdi")
-		    (make-callq :label "print_int"))))
+	      (list (make-callq :label "print_int"))))
 		 
 	  
 	 ((atomic-sum :lexp e1 :rexp e2)
 	  (cond ((py-constant-p e1)
-		 
-		 (let* ((hash-values (hash-table-values *registers*))
-		       (hash-keys (hash-table-values *registers*))
-		       (last-key (car (last hash-keys)))
-		       (reg (gethash last-key *registers*)))
-		   (remhash last-key *registers*)
-		   (list (make-instruction :name "addq"
-					   :arg1 (py-constant-num e1)
-					   :arg2 reg)
-			 (make-instruction :name "retq"
-					   :arg1 'no-arg
-					   :arg2 'no-arg))))
+		 (list (make-instruction :name "addq"
+					 :arg1 (py-constant-num e1)
+					 :arg2 reg)
+			(make-instruction :name "retq"
+					  :arg1 'no-arg
+					  :arg2 'no-arg)))
 		(t (error "E1 isnt a constant."))))
+	 
 	 ((if-atomic :block b1 :begin-then bthen :begin-else bels :condition e)
 	  (let* ((set-instrs1 (mapcar (lambda (instr) (select-instrs instr))
 				      bthen))
@@ -134,9 +112,12 @@
 		 (conditional (select-instrs e)))
 	    (list conditional
 		  (make-instruction :name "je" :arg1 b1 :arg2 'no-arg)
-		  set-instrs1
+		  (make-instruction :name "jmp" :arg1 "block_2" :arg2 'no-arg)
 		  b1
+		  set-instrs1
+		  "block_2"
 		  set-instrs2)))
+	 
 	 ((while-atomic :loop-block loopb :test-block testb :pre-block preb)
 	  (let ((setloopb (mapcar (lambda (n) (select-instrs n)) (if (listp loopb) loopb (list loopb))))
 		(settestb (mapcar (lambda (n) (select-instrs n)) (if (listp testb) testb (list testb))))

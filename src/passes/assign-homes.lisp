@@ -1,9 +1,5 @@
 (in-package #:zetta)
 
-(defparameter *varnames* (make-hash-table :test 'equal))
-
-(defvar *variable* 4)
-
 (defun patch-instructions (instr)
   (match instr
 	 ((instruction :name name :arg1 a1 :arg2 a2)
@@ -23,155 +19,137 @@
 	  (make-callq :label la))))
 
 (defun assign-homes (instructions)
- (flatten (mapcar (lambda (instr) (assignh  instr)) (flatten (mapcar (lambda (n) (patch-instructions n)) instructions)))))
+  (let ((*varnames* (make-hash-table :test 'equal))
+	(*variable* 0))
+    (labels ((assignh (instr)
+	       (match instr
+	         ((instruction :name name :arg1 a1 :arg2 a2)
+	           (cond ((and (numberp a1)
+		               (atomic-var-p a2))
+		           (if (gethash a2 *varnames*)
+		               (make-instruction :name name
+				                 :arg1 a1
+				                 :arg2 (gethash a2 *varnames*))
+		               (progn (setf *variable* (+ *variable* 8))
+		                      (setf (gethash a2 *varnames*)
+		                            (concatenate 'string "-" (write-to-string *variable*) "(%rbp)"))
+			               (make-instruction :name name
+					                 :arg1 a1
+				                         :arg2 (gethash a2 *varnames*)))))
+
+		          ((and (immediate-p a1)
+		                (atomic-var-p a2))
+		           (if (gethash a2 *varnames*)
+		               (make-instruction :name name
+				                 :arg1 a1
+				                 :arg2 (gethash a2 *varnames*))
+		               (progn (setf *variable* (+ *variable* 8))
+		                      (setf (gethash a2 *varnames*)
+		                            (concatenate 'string "-" (write-to-string *variable*) "(%rbp)"))
+			              (make-instruction :name name
+					                :arg1 a1
+				                        :arg2 (gethash a2 *varnames*)))))
+			  ((and (atomic-var-p a1)
+				(stringp a2))
+			   (if (gethash a1 *varnames*)
+			       (make-instruction :name name
+				                 :arg1 (gethash a1 *varnames*)
+				                 :arg2 a2)))
+			      ;; (progn (setf *variable* (+ *variable* 8))
+		                     ;; (setf (gethash a1 *varnames*)
+		                            ;;(concatenate 'string "-" (write-to-string *variable*) "(%rbp)"))
+			              ;(make-instruction :name name
+				                        ;:arg1 (gethash a1 *varnames*)
+				                        ;:arg2 a2))))
+			   ((and (stringp a1)
+		                 (atomic-var-p a2))
+			    (if (gethash a2 *varnames*)
+				(make-instruction :name name
+				                  :arg1 a1
+				                  :arg2 (gethash a2 *varnames*))
+				(progn (setf *variable* (+ *variable* 8))
+		                       (setf (gethash a2 *varnames*)
+		                             (concatenate 'string "-" (write-to-string *variable*) "(%rbp)"))
+			               (make-instruction :name name
+				                         :arg1 a1
+				                         :arg2 (gethash a2 *varnames*)))))
+			   ((and (atomic-var-p a1)
+				 (atomic-var-p a2))
+			    (cond ((and (gethash a1 *varnames*)
+				        (gethash a2 *varnames*))
+				    (make-instruction :name name
+						      :arg1 (gethash a1 *varnames*)
+						      :arg2 (gethash a2 *varnames*)))
+				  ((and (gethash a1 *varnames*)
+					(not (gethash a2 *varnames*)))
+				   (progn (setf *variable* (+ *variable* 8))
+					  (setf (gethash a2 *varnames*)
+						(concatenate 'string "-" (write-to-string *variable*) "(%rbp)"))
+					  (make-instruction :name name
+							    :arg1 (gethash a1 *varnames*)
+							    :arg2 (gethash a2 *varnames*))))
+				  ((and (not (gethash a1 *varnames*))
+					(gethash a2 *varnames*))
+				   (progn (setf *variable* (+ *variable* 8))
+					  (setf (gethash a2 *varnames*)
+						(concatenate 'string "-" (write-to-string *variable*) "(%rbp)"))
+					  (make-instruction :name name
+							    :arg1 (gethash a1 *varnames*)
+							    :arg2 (gethash a2 *varnames*))))))
+				  
+					      
+			    ((and (atomic-var-p a1)
+		                  (symbolp a2))
+			     (if (gethash a1 *varnames*)
+				 (make-instruction :name name
+				                   :arg1 (gethash a1 *varnames*)
+				                   :arg2 a2)
+				 (progn (setf *variable* (+ *variable* 8))
+		                        (setf (gethash a1 *varnames*)
+		                              (concatenate 'string "-" (write-to-string *variable*) "(%rbp)"))
+					(make-instruction :name name
+				                          :arg1 (gethash a1 *varnames*)
+				                          :arg2 a2))))
+			   ((and (py-constant-p a1)
+		                 (atomic-var-p a2))
+			    (if (gethash a2 *varnames*)
+				(make-instruction :name name
+				                  :arg1 a1
+				                  :arg2 (gethash a2 *varnames*))
+				(progn (setf *variable* (+ *variable* 8))
+		                       (setf (gethash a2 *varnames*)
+		                             (concatenate 'string "-" (write-to-string *variable*) "(%rbp)"))
+				       (make-instruction :name name
+					                 :arg1 a1
+					                 :arg2 (gethash a2 *varnames*)))))
+			   ((and (py-var-p a1)
+		                 (atomic-var-p a2))
+			    (if (gethash a2 *varnames*)
+				(make-instruction :name name
+				                  :arg1 a1
+				                  :arg2 (gethash a2 *varnames*))
+				(progn (setf *variable* (+ *variable* 8))
+		                       (setf (gethash a2 *varnames*)
+		                             (concatenate 'string "-" (write-to-string *variable*) "(%rbp)"))
+				       (make-instruction :name name
+					                 :arg1 a1
+					                 :arg2 (gethash a2 *varnames*)))))
+			   (t (error "Not valid Instruction."))))
+		 ((callq :label lbl)
+		  instr))))
+	     (flatten (mapcar (lambda (instr) (assignh  instr))  instructions)))))		     
 					 
-(defun assignh (instr)
-  (match instr
-	 ((instruction :name name :arg1 a1 :arg2 a2)
-	  (cond ((and (numberp a1)
-		      (atomic-var-p a2))
-		 (if (gethash a2 *varnames*)
-		     (make-instruction :name name
-				       :arg1 a1
-				       :arg2 (gethash a2 *varnames*))
-		     (progn (assign-stack instr)
-			    (make-instruction :name name
-					      :arg1 a1
-				              :arg2 (gethash a2 *varnames*)))))
 
-		((and (immediate-p a1)
-		      (atomic-var-p a2))
-		 (if (gethash a2 *varnames*)
-		     (make-instruction :name name
-				       :arg1 a1
-				       :arg2 (gethash a2 *varnames*))
-		     (progn (assign-stack instr)
-			    (make-instruction :name name
-					      :arg1 a1
-				              :arg2 (gethash a2 *varnames*)))))
-		 
+(defun clean (ast)
+  (labels ((clean-select-pass (instr)
+	     (match instr
+		    ((instruction :name name :arg1 a1 :arg2 a2)
+		     (if (and (atomic-var-p a1) (py-var-p (atomic-var-name a1)))
+			 (make-instruction :name name
+					   :arg1 (make-atomic-var :name (py-var-name (atomic-var-name a1)))
+					   :arg2 a2)
+			 instr)))))
+    (flatten (mapcar (lambda (instr) (clean-select-pass instr)) ast))))
 
-
-		((and (atomic-var-p a1)
-		      (stringp a2))
-		 (if (gethash a1 *varnames*)
-		     (make-instruction :name name
-				       :arg1 (gethash a1 *varnames*)
-				       :arg2 a2)
-		     (progn (assign-stack instr)
-			    (make-instruction :name name
-				       :arg1 (gethash a1 *varnames*)
-				       :arg2 a2))))
-
-		((and (stringp a1)
-		      (atomic-var-p a2))
-		 
-		  (if (gethash a2 *varnames*)
-		     (make-instruction :name name
-				       :arg1 a1
-				       :arg2 (gethash a2 *varnames*))
-		     (progn (assign-stack instr)
-			    (make-instruction :name name
-				       :arg1 a1
-				       :arg2 (gethash a2 *varnames*)))))
-			    
-
-		((and (atomic-var-p a1)
-		      (symbolp a2))
-		 (if (gethash a1 *varnames*)
-		     (make-instruction :name name
-				       :arg1 (gethash a1 *varnames*)
-				       :arg2 a2)
-		     (progn (assign-stack instr)
-			    (make-instruction :name name
-				       :arg1 (gethash a1 *varnames*)
-				       :arg2 a2))))
-
-		((and (py-constant-p a1)
-		      (atomic-var-p a2))
-		 (if (gethash a2 *varnames*)
-		     (make-instruction :name name
-				       :arg1 a1
-				       :arg2 (gethash a2 *varnames*))
-		     (progn (assign-stack instr)
-			    (make-instruction :name name
-					      :arg1 a1
-					      :arg2 (gethash a2 *varnames*)))))
-
-		((and (py-var-p a1)
-		      (atomic-var-p a2))
-		 (if (gethash a2 *varnames*)
-		      (make-instruction :name name
-				       :arg1 a1
-				       :arg2 (gethash a2 *varnames*))
-		     (progn (assign-stack instr)
-			    (make-instruction :name name
-					      :arg1 a1
-					      :arg2 (gethash a2 *varnames*)))))
-		     
-		 
-
-		(t (error "Not valid Instruction."))))
-
-	 ((callq :label lbl)
-	  instr)))
-
-(defun assign-stack (instr)
-  (match instr
-	 ((instruction :name name :arg1 a1 :arg2 a2)
-	  (cond ((and (numberp a1)
-		      (atomic-var-p a2))
-		 (setf *variable* (* *variable* 2))
-		 (setf (gethash a2 *varnames*)
-		       (concatenate 'string "-" (write-to-string *variable*) "(%rbp)")))
-
-		((and (immediate-p a1)
-		      (atomic-var-p a2))
-		 (setf *variable* (* *variable* 2))
-		 (setf (gethash a2 *varnames*)
-		       (concatenate 'string "-" (write-to-string *variable*) "(%rbp)")))
-			
-		
-		((and (atomic-var-p a1)
-		      (stringp a2))
-		 (setf *variable* (* *variable* 2))
-		 (setf (gethash a1 *varnames*)
-		       (concatenate 'string "-" (write-to-string *variable*) "(%rbp)")))
-		((and (stringp a1)
-		      (atomic-var-p a2))
-		 (setf *variable* (* *variable* 2))
-		 (setf (gethash a2 *varnames*)
-		       (concatenate 'string "-" (write-to-string *variable*) "(%rbp)")))
-
-		((and (atomic-var-p a1)
-		      (symbolp a2))
-		 (setf *variable* (* *variable* 2))
-		 (setf (gethash a1 *varnames*)
-		       (concatenate 'string "-" (write-to-string *variable*) "(%rbp)")))
-
-		((and (py-constant-p a1)
-		      (atomic-var-p a2))
-		 (setf *variable* (* *variable* 2))
-		 (setf (gethash a2 *varnames*)
-		       (concatenate 'string "-" (write-to-string *variable*) "(%rbp)")))
-		((and (py-var-p a1)
-		      (atomic-var-p a2))
-		 (setf *variable* (* *variable* 2))
-		 (setf (gethash a2 *varnames*)
-		       (concatenate 'string "-" (write-to-string *variable*) "(%rbp)")))
-		(t (error "Not valid intr for assigning stack."))))))
-
-		 
-
-		
-		       
-				    
-		       
-
-
-		
-
-		
-  
-	        
-  
+(defun without-last (lst)
+  (reverse (cdr (reverse lst))))
