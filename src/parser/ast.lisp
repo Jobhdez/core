@@ -58,3 +58,8 @@
 
 (defstruct py-constant
   num)
+
+(defstruct tuple
+  int)
+
+(defstruct tuple-index tuple index)

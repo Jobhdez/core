@@ -56,9 +56,17 @@
 		    :args args
 		    :statements statements))
 
+(defun build-tuple (tuple-tok lparen-tok elements rparen-tok)
+  (declare (ignore tuple-tok lparen-tok rparen-tok))
+  (make-tuple :int (flatten elements)))
+
+(defun build-tuple-index (tuple lbracket index rbracket)
+  (declare (ignore  lbracket rbracket))
+  (make-tuple-index :tuple tuple :index index))
+
 (define-parser *python-grammar*
     (:start-symbol module)
-  (:terminals (:boolop :unaryop :cmp :bool :assignment :if :else :while :colon :name :constant :right-paren :left-paren :print :plus :minus :fun))
+  (:terminals (:boolop :unaryop  :left-bracket :right-bracket :cmp :tuple :bool :assignment :if :else :while :colon :name :constant :comma :right-paren :left-paren :print :plus :minus :fun))
   (module
    (statements #'build-module))
   (statements
@@ -69,6 +77,7 @@
   (statement
    (:print :left-paren :right-paren)
    (:print :left-paren exp :right-paren #'build-print)
+   tuple-index
    function
    exp
    assignment
@@ -85,7 +94,15 @@
    (:bool #'build-bool)
    (exp :boolop exp #'build-bool-op)
    (:unaryop exp #'build-unaryop)
-   (exp :cmp exp #'build-cmp))
+   (exp :cmp exp #'build-cmp)
+   tuple)
+  (tuple
+   (:tuple :left-paren elements :right-paren #'build-tuple))
+  (elements
+   int
+   (int elements))
+  (tuple-index
+   (tuple :left-bracket int :right-bracket #'build-tuple-index))
   (args
    variable
    (variable args))
