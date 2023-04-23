@@ -36,6 +36,15 @@
 			               (make-instruction :name name
 					                 :arg1 a1
 				                         :arg2 (gethash a2 *varnames*)))))
+			 ((and (immediate-p a1) (stringp a2))
+			  instr)
+
+			 ;; registers
+			 ((and (stringp a1) (stringp a2))
+			  instr)
+
+			 ((and (stringp a1) (symbolp a2))
+			  instr)
 
 		          ((and (immediate-p a1)
 		                (atomic-var-p a2))

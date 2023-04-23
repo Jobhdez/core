@@ -72,10 +72,21 @@
 		((py-sub-p e)
 		 (make-py-assignment :name (make-atomic-var :name name)
 				     :exp e))
+		((and (symbolp name) (py-constant-p e))
+		 (make-py-assignment :name (make-atomic-var :name name)
+				     :exp e))
+		((and (symbolp name) (py-sum-p e))
+		 (make-py-assignment :name (make-atomic-var :name name)
+				     :exp e))
 		
 		((py-sum-p e)
 		 (cond ((positive-sum-p e)
 			e)
+
+		       ((and (py-var-p (py-sum-lexp e))
+			     (py-constant-p (py-sum-rexp e)))
+			(make-atomic-sum :lexp (py-var-name (py-sum-lexp e))
+					 :rexp (py-constant-num (py-sum-rexp e))))
 		       
 		       ((variable-sum-p e)
 			(make-py-assignment :name (make-atomic-var :name name) :exp e))

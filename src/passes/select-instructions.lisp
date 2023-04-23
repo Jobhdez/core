@@ -124,11 +124,11 @@
 			    (setpreb (mapcar (lambda (n) (select-instrs n)) (if (listp preb) preb (list preb)))))
 			(list setpreb
 			      (make-instruction :name "jmp" :arg1 "test" :arg2 'no-arg)
-			      "loop:"
+			      (make-instruction :name "jg" :arg1 "loop" :arg2 'no-arg)
+			      (make-block-py :name "loop:")
 			      setloopb
-			      "test:"
-			      settestb
-			      (make-instruction :name "jg" :arg1 "loop" :arg2 'no-arg))))
+			      (make-block-py :name "test:")
+			      settestb)))
 
 		     ((py-cmp :lexp e1 :cmp compare :rexp e2)
 		      (cond ((equalp "==" (string-upcase compare))
@@ -146,8 +146,6 @@
 				 (list (make-instruction :name "cmpq"
 						     :arg1 "$1"
 							 :arg2 (if (py-var-p e1) (make-atomic-var :name (py-var-name e1)) e1))))))))))
-	    (alexandria::flatten (mapcar (lambda (n) (select-instrs n)) ast)))))
+    (alexandria::flatten (mapcar (lambda (n) (select-instrs n)) ast)))))
 
-
-
-
+		     
