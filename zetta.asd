@@ -13,6 +13,7 @@
 	      :components ((:file "parser")
 			   (:file "ast")))
      (:module "passes"
-	      :components ((:file "remove-complex-operands")
-			   (:file "select-instructions")
-			   (:file "assign-homes")))))
+      :components ((:file "expose-allocation")
+		   (:file "remove-complex-operands")
+		   (:file "select-instructions")
+		   (:file "assign-homes")))))
