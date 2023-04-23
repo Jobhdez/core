@@ -35,7 +35,7 @@ graph TD;
     Source-Program-->Parse-Tree;
     Parse-Tree-->Remove-Complex-Operands;
     Remove-Complex-Operands-->Instruction-Selection;
-    Instruction-Selection-->assembly-homes;
+    Instruction-Selection-->assign-homes;
 ```
 
 ## Disclaimer
