@@ -20,7 +20,7 @@
 					
 					(make-py-if :exp (make-py-cmp :lexp (make-py-sum :lexp (make-global-value :arg1 'free_ptr)
 											 :rexp (make-py-constant :num (* (length elements) 4)))
-								      :cmp (make-less-than :op '<)
+								      :cmp  "<"
 								      :rexp (make-global-value :arg1 'fromspace_end))
 						    :if-statement (make-py-constant :num 0)
 						    :else-statement (make-collect :bytes (* (length elements) 4)))

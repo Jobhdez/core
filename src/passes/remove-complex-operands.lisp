@@ -77,8 +77,8 @@
 			         (make-atomic-sum :lexp tmp-var
 			                          :rexp (remove-complex e2)))))))
 		 ((and (global-value-p e1) (py-constant-p e2))
-		  (let* ((temp-name (generate-temp-name "temp_"))
-			 (temp-name2 (generate-temp-name "temp_")))
+		  (let* ((temp-name (generate-temp-name "temp*_"))
+			 (temp-name2 (generate-temp-name "temp*_")))
 			   (list (make-atomic-assignment  :temp-var temp-name
 							  :n e1)
 			         (make-atomic-assignment :temp-var temp-name2

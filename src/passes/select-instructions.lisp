@@ -24,6 +24,10 @@
 
 (defstruct block-py name)
 
+(defstruct free-pointer register)
+(defstruct from-space register)
+(defstruct tag t)
+
 (defun select-instructions (ast)
   (let ((blocks (make-hash-table :test 'equalp)))
   (labels ((select-instrs (node)
@@ -39,6 +43,20 @@
 				       (make-instruction :name "addq"
 							 :arg1 tmp-var
 							 :arg2 var-name))))
+			    ((allocate-p e1)
+			     (list (make-instruction :name "movq"
+						     :arg1 (make-free-pointer :register "(%rip)")
+						     :arg1 "%r11")
+				   (make-instruction :name "addq"
+						     :arg1 (concatenate 'string "8" "(" (write-to-string (+ (allocate-len e1) 1)))
+						     :arg2 (make-free-pointer :register "%rip"))
+				   (make-instruction :name "movq"
+						     :arg1 (make-tag :t 'tag)
+						     :arg2 "0(%r11)")
+				   (make-instruction :name "movq"
+						     :arg1 "%r11"
+						     :arg2 var-name)))
+									
 			    ((py-constant-p  e1)
 			     (make-instruction :name "movq"
 					       :arg1 e1
@@ -62,6 +80,13 @@
 							       :arg1 "$1"
 							       :arg2 var-name))))))
 
+			    ((and (atomic-var-p var-name)
+				  (atomic-var-p e1))
+			     (make-instruction :name "movq"
+					       :arg1 var-name
+					       :arg2 e1))
+
+
 
 			    (t (error "Not valid PY-ASSIGNMENT."))))					 
 
@@ -76,6 +101,25 @@
 				  (make-instruction :name "addq"
 						    :arg1 vari
 						    :arg2 tmp))))
+                            ((global-value-p n)
+			     (if (equalp (global-value-arg1 n) 'free_ptr)
+				 (make-instruction :name "movq"
+					           :arg1 (make-free-pointer :register "(%rip)")
+					           :arg2 tmp)
+				 (make-instruction :name "movq"
+						   :arg1 (make-from-space :register "(%rip)")
+						   :arg2 tmp)))
+			     
+
+			    ((atomic-sum-p n)
+			     (list (make-instruction :name "movq"
+						     :arg1 (atomic-sum-lexp n)
+						     :arg2 tmp)
+				   (make-instruction :name "addq"
+						     :arg1 (atomic-sum-rexp n)
+						     :arg2 tmp)))
+					       
+			    
 			    ((py-neg-num-p n)
 
 			     (let* ((num (py-constant-num (py-neg-num-num n)))
@@ -106,9 +150,13 @@
 
 		     ((if-atomic :block b1 :begin-then bthen :begin-else bels :condition e)
 		      (let* ((set-instrs1 (mapcar (lambda (instr) (select-instrs instr))
-						  bthen))
+						  (if (listp bthen)
+						      bthen
+						      (list bthen))))
 			     (set-instrs2 (mapcar (lambda (instr) (select-instrs instr))
-						 bels))
+						  (if (listp bels)
+						      bels
+						      (listp bels))))
 			     (conditional (select-instrs e)))
 			(list conditional
 			      (make-instruction :name "je" :arg1 b1 :arg2 'no-arg)
@@ -129,6 +177,16 @@
 			      setloopb
 			      (make-block-py :name "test:")
 			      settestb)))
+		     
+		     ((collect :bytes bytes)
+		      (list (make-instruction :name "movq"
+					      :arg1 "%r15"
+					      :arg2 "%rdi")
+			    (make-instruction :name "movq"
+					      :arg1 (concatenate 'string "$" (write-to-string bytes))
+					      :arg2 "%rsi")
+			    (make-callq :label "collect")))
+		     
 
 		     ((py-cmp :lexp e1 :cmp compare :rexp e2)
 		      (cond ((equalp "==" (string-upcase compare))
@@ -145,7 +203,11 @@
 			     (if (equalp 1 (py-constant-num e2))
 				 (list (make-instruction :name "cmpq"
 						     :arg1 "$1"
-							 :arg2 (if (py-var-p e1) (make-atomic-var :name (py-var-name e1)) e1))))))))))
+							 :arg2 (if (py-var-p e1) (make-atomic-var :name (py-var-name e1)) e1)))))
+			    ((equalp "<" (string-upcase compare))
+			     (list (make-instruction :name "cmpq"
+						     :arg1 e2
+						     :arg1 e1))))))))
     (alexandria::flatten (mapcar (lambda (n) (select-instrs n)) ast)))))
 
 		     
