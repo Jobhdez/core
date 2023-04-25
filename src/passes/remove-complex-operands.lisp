@@ -52,7 +52,9 @@
 				    :n (make-global-value :arg1 a1))))
 
 	 ((py-function :name f :args args :statements statements)
-	  parse-node)
+	  (make-py-function :name f
+			    :args args
+			    :statements (flatten (mapcar (lambda (instr) (remove-complex instr)) (if (listp statements) statements (list statements))))))
 	 
 	 ((function-call :var v :exp e)
 	  parse-node)
@@ -67,6 +69,15 @@
 	 ((py-sum :lexp e1 :rexp e2)
 	  (cond ((and (py-constant-p e1) (py-constant-p e2))
 	         (list (make-py-sum :lexp e1 :rexp e2)))
+
+		((and (py-var-p e1) (py-neg-num-p e2))
+		 (let ((temp-1 (generate-temp-name "temp_"))
+		       (temp-2 (generate-temp-name "temp_")))
+		   (list (make-atomic-assignment :temp-var temp-1
+						 :n e2)
+			 (make-atomic-assignment :temp-var temp-2
+						 :n (make-atomic-sum :lexp (make-atomic-var :name (py-var-name e1))
+								     :rexp  temp-1)))))
 
 		
 	        ((or (py-neg-num-p e2) (py-neg-num-p e1))

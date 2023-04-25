@@ -25,7 +25,9 @@
 (defstruct block-py name)
 
 (defstruct free-pointer register)
+
 (defstruct from-space register)
+
 (defstruct tag t)
 
 (defun select-instructions (ast)
@@ -188,7 +190,7 @@
 			    (make-callq :label "collect")))
 
 		     ((py-function :name name :args args :statements statements)
-		       (if (py-sum-p statements)
+		       (cond ((py-sum-p statements)
 			   (flatten
 			    (list
 			    (loop for i in (if (listp args) args (list args))
@@ -199,7 +201,13 @@
 					       :arg2 "%rax")
 			     (make-instruction :name "addq"
 					       :arg1 (make-atomic-var :name (py-var-name (py-sum-rexp statements)))
-					       :arg2 "%rax")))))
+					       :arg2 "%rax"))))
+			     ((list-of-atomic-assignment-p statements)
+			      (flatten (list (loop for i in (if (listp args) args (list args))
+						   for j in (list "rdi" "rsi" "rdx" "rcx" "r8" "r9")
+						   collect (make-instruction :name "movq" :arg1 j :arg2 i))
+					     
+					     (make-from-atomic-assignments statements))))))
 
 		     ((function-call :var var :exp exp)
 		      (let ((fn-name (generate-fn-name "fun")))
@@ -250,8 +258,37 @@
 						     :arg1 e1))))))))
     (alexandria::flatten (mapcar (lambda (n) (select-instrs n)) ast)))))
 
+
+
+(defun list-of-atomic-assignment-p (statements)
+  (cond ((null statements) T)
+	((not (atomic-assignment-p (car statements))) nil)
+	(t (and (atomic-assignment-p (car statements))
+		   (list-of-atomic-assignment-p (cdr statements))))))
+
+(defun make-from-atomic-assignments (statements)
+  (labels ((make-from (statement)
+	     (match statement
+		    ((atomic-assignment :temp-var var :n n)
+		     (cond ((py-neg-num-p n)
+			    (list (make-instruction :name "movq" :arg1 (py-neg-num-num n) :arg2 var)
+				  (make-instruction :name "subq" :arg1 var :arg2 'no-arg)))
+			    ((atomic-sum-p n)
+			     (list (make-instruction :name "movq"
+						     :arg1 (atomic-sum-rexp n)
+						     :arg1 "%rax")
+				   (make-instruction :name "addq"
+						     :arg1 (atomic-sum-lexp n)
+						     :arg2 "%rax")))
+			    (t (error "not valid instruction.")))))))
+    (mapcar (lambda (statement) (make-from statement)) statements)))
+				       
+      
 (defvar namecounter 0)		     
 (defun generate-fn-name (name)
   (progn
     (setf namecounter (+ namecounter 1))
     (concatenate 'string name (write-to-string namecounter))))
+
+
+    
