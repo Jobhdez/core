@@ -186,8 +186,48 @@
 					      :arg1 (concatenate 'string "$" (write-to-string bytes))
 					      :arg2 "%rsi")
 			    (make-callq :label "collect")))
-		     
 
+		     ((py-function :name name :args args :statements statements)
+		       (if (py-sum-p statements)
+			   (flatten
+			    (list
+			    (loop for i in (if (listp args) args (list args))
+				  for j in (list "rdi" "rsi" "rdx" "rcx" "r8" "r9")
+				  collect (make-instruction :name "movq" :arg1 j :arg2 i))
+			     (make-instruction :name "movq"
+					       :arg1 (make-atomic-var :name (py-var-name (py-sum-lexp statements)))
+					       :arg2 "%rax")
+			     (make-instruction :name "addq"
+					       :arg1 (make-atomic-var :name (py-var-name (py-sum-rexp statements)))
+					       :arg2 "%rax")))))
+
+		     ((function-call :var var :exp exp)
+		      (let ((fn-name (generate-fn-name "fun")))
+			
+		      (list
+		       (make-instruction :name "leaq"
+					 :arg1 var
+					 :arg2 fn-name)
+		       (if (not (listp exp))
+			   (loop for i in (list exp)
+				 for j in (list "rdi" "rsi" "rdx" "rcx" "r8" "r9")
+				 collect (make-instruction :name "movq"
+							   :arg1 i
+							   :arg2 j))
+			   (loop for i in exp
+				 for j in (list "rdi" "rsi" "rdx" "rcx" "r8" "r9")
+				 collect (make-instruction :name "movq"
+							   :arg1 i
+							   :arg2 j)))
+		       (make-callq :label fn-name)
+		       (make-instruction :name "movq"
+					 :arg1 "%rax"
+					 :arg2 "temp1")
+		       (make-instruction :name "movq"
+					 :arg1 "temp1"
+					 :arg2 "%rdi")
+		       (make-callq :label "print_int"))))
+			    
 		     ((py-cmp :lexp e1 :cmp compare :rexp e2)
 		      (cond ((equalp "==" (string-upcase compare))
 			  (list (make-instruction :name "movq"
@@ -210,4 +250,8 @@
 						     :arg1 e1))))))))
     (alexandria::flatten (mapcar (lambda (n) (select-instrs n)) ast)))))
 
-		     
+(defvar namecounter 0)		     
+(defun generate-fn-name (name)
+  (progn
+    (setf namecounter (+ namecounter 1))
+    (concatenate 'string name (write-to-string namecounter))))

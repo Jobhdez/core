@@ -43,6 +43,9 @@
 (defun build-variable (var)
   (make-py-var :name var))
 
+(defun build-fn-name (fn-name)
+  (make-fn-name :name fn-name))
+
 (defun build-assignment (name assignment-token exp)
   (declare (ignore assignment-token))
   (make-py-assignment :name name :exp exp))
@@ -50,8 +53,8 @@
 (defun build-int (num)
   (make-py-constant :num num))
 
-(defun build-function (fun-tok var lparen-tok args r-paren colon-tok statements)
-  (declare (ignore fun-tok lparen-tok r-paren colon-tok))
+(defun build-function (fun-tok var lparen-tok args r-paren colon-tok statements semicolontoken)
+  (declare (ignore fun-tok lparen-tok r-paren colon-tok semicolontoken))
   (make-py-function :name var
 		    :args args
 		    :statements statements))
@@ -61,12 +64,16 @@
   (make-tuple :int (flatten elements)))
 
 (defun build-tuple-index (tuple lbracket index rbracket)
-  (declare (ignore  lbracket rbracket))
+  (declare (ignore lbracket rbracket))
   (make-tuple-index :tuple tuple :index index))
+
+(defun build-function-call (var lparen-tok exp rparen-tok)
+  (declare (ignore lparen-tok rparen-tok))
+  (make-function-call :var var :exp exp))
 
 (define-parser *python-grammar*
     (:start-symbol module)
-  (:terminals (:boolop :unaryop  :left-bracket :right-bracket :cmp :tuple :bool :assignment :if :else :while :colon :name :constant :comma :right-paren :left-paren :print :plus :minus :fun))
+  (:terminals (:boolop :unaryop  :left-bracket :right-bracket :cmp :tuple :bool :assignment :if :else :while :colon :name :constant :comma :right-paren :left-paren :print :plus :minus :def :semicolon))
   (module
    (statements #'build-module))
   (statements
@@ -84,8 +91,9 @@
    (statements :while exp :colon statements #'build-while)
    (:if exp :colon statements :else :colon statements #'build-if))
   (function
-   (:fun variable :left-paren args :right-paren :colon statements #'build-function))
+   (:def variable :left-paren args :right-paren :colon statements :semicolon #'build-function))
   (exp
+   function-call
    variable
    int
    (:minus exp #'build-neg-num)
@@ -96,6 +104,8 @@
    (:unaryop exp #'build-unaryop)
    (exp :cmp exp #'build-cmp)
    tuple)
+  (function-call
+   (variable :left-paren exp :right-paren #'build-function-call))
   (tuple
    (:tuple :left-paren elements :right-paren #'build-tuple))
   (elements
@@ -108,6 +118,7 @@
    (variable args))
   (variable
    (:name #'build-variable))
+  (function-name variable #'build-fn-name)
   (assignment
    (:name :assignment exp #'build-assignment))
   (int

@@ -63,3 +63,5 @@
   int)
 
 (defstruct tuple-index tuple index)
+
+(defstruct function-call var exp)

@@ -51,6 +51,12 @@
 	    (make-atomic-assignment :temp-var temp-name
 				    :n (make-global-value :arg1 a1))))
 
+	 ((py-function :name f :args args :statements statements)
+	  parse-node)
+	 
+	 ((function-call :var v :exp e)
+	  parse-node)
+
 	 ((collect :bytes bytes)
 	  (collect :bytes bytes))
 	 
