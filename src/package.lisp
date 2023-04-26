@@ -15,7 +15,18 @@
 	   #:make-instruction
 	   #:make-atomic-var
 	   #:make-immediate
-	   #:make-callq))
+	   #:make-callq
+	   #:make-py-module
+	   #:make-py-sum
+	   #:make-py-cmp
+	   #:make-py-if
+	   #:make-py-neg-num
+	   #:make-py-assignment
+	   #:make-py-print
+	   #:make-py-neg-num
+	   #:make-py-constant
+	   #:make-py-print
+	   #:make-py-var))
 
 (defpackage #:zetta-var
   (:use))
