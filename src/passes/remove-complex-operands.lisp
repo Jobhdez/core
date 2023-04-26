@@ -117,9 +117,7 @@
 		((and (symbolp name) (py-constant-p e))
 		 (make-py-assignment :name (make-atomic-var :name name)
 				     :exp e))
-		((and (symbolp name) (py-sum-p e))
-		 (make-py-assignment :name (make-atomic-var :name name)
-				     :exp e))
+	     
 
 		((and (stringp name) (stringp e))
 		 (make-py-assignment :name (make-atomic-var :name name)
@@ -154,6 +152,13 @@
 			       (temp-name (generate-temp-name "temp_")))
 			  (setf (gethash name *temp-names*) name)
 	                  (list temp-exp atomic-exp1)))
+
+		       	((symbolp name) 
+		          (make-py-assignment :name (make-atomic-var :name name)
+				                  :exp e))
+
+
+		       
 		       (t (error "No more valid sum expressions."))))
 
 		((py-constant-p e)
