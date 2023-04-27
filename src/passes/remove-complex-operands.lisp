@@ -26,22 +26,11 @@
   "Removes complex operands. Eg each subexpression of a binary-op needs to be
    a atomic expression which is an integer or variable. complex operations
   get assigned to a variable; an example of a complex expression is -10."
-  (cond ((py-module-p parse-tree)
-	 (if (listp (py-module-statements parse-tree))
-             (flatten (mapcar (lambda (node) (remove-complex node)) (flatten (py-module-statements parse-tree))))))
-	((begin-p parse-tree)
-	 (remove-complex parse-tree))))
 
-(defparameter *temp-names* (make-hash-table))
-
-(defun remove-complex (parse-node)
-  "Given a parse tree node it removes the complex expression.
-   theres three types of assignment:
-
-        1. x = 10 + -3
-        2. y = 2
-        3. z = x + y"
-  
+  (let ((*temp-names* (make-hash-table))
+	(gensym-count 0))
+    (labels ((remove-complex (parse-node)
+	         
   (match parse-node
 	 ((py-constant :num n)
 	  (make-py-constant :num n))
@@ -221,6 +210,21 @@
 		     exps2
 		     (make-py-cmp :lexp temp2 :cmp cmp :rexp temp3))))))
 	  (_ (error "no valid expression."))))
+	     (generate-temp-name (prefix-name)
+	       (progn (setf gensym-count (+ gensym-count 1))
+	 (concatenate 'string
+		      prefix-name
+		      (write-to-string gensym-count)))))
+      
+	       
+	       
+	
+  (cond ((py-module-p parse-tree)
+	 (if (listp (py-module-statements parse-tree))
+             (flatten (mapcar (lambda (node) (remove-complex node)) (flatten (py-module-statements parse-tree))))))
+	((begin-p parse-tree)
+	 (remove-complex parse-tree))))))
+
 
 (defun positive-sum-p (node)
   "Checks whether NODE is a sum expression composed of positive numbers."
