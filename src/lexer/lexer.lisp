@@ -7,7 +7,7 @@
   (cons type val))
 
 (alexa:define-string-lexer python-lexer
-    "Make a lexical analyzer for Python expressions."
+  "Make a lexical analyzer for Python expressions."
   ((:num "\\d+")
    (:name "[A-Za-z][A-Za-z0-9_]*"))
   ("and"      (return (tok :boolop (intern (string-upcase $@) 'keyword))))
