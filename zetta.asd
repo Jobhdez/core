@@ -30,4 +30,5 @@
   :serial t
   :components ((:file "package")
 	       (:file "parser-tests")
+	       (:file "remove-complex-tests")
 	       (:file "utilities")))
