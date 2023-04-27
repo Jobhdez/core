@@ -18,15 +18,19 @@
 	   #:make-callq
 	   #:make-py-module
 	   #:make-py-sum
+	   #:make-atomic-sum
 	   #:make-py-cmp
 	   #:make-py-if
+	   #:make-if-atomic
 	   #:make-py-neg-num
 	   #:make-py-assignment
 	   #:make-py-print
 	   #:make-py-neg-num
 	   #:make-py-constant
 	   #:make-py-print
-	   #:make-py-var))
+	   #:make-py-var
+	   #:make-atomic-assignment
+	   #:make-py-constant))
 
 (defpackage #:zetta-var
   (:use))
