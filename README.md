@@ -1,5 +1,5 @@
 # zettapy
-`Zettapy` is a small toy compiler for the core of imperative languages (i.e., loops, if statements, variables, assignment). Currently, it compiles assignment, integer arithmetic, if statements, and while loops to a low level ast; the low level ast consists of the x86 instructions but the instructions do not adhere to the x86 rule that arguments cannot be both stack locations. Tuples and simple functions are also compiled to a low level ast.
+`Zettapy` is a small toy compiler for the core of imperative languages. It compiles Python syntax although it is not really Python3.
 
 ## State of the compiler
 It lowers if statements, while loops, assignment, basic arithmetic, tuples, and high level functions to a low level ast whose instructions are explicit x86-64 instructions.
@@ -33,6 +33,11 @@ Note: clone this project in `quicklisp/local-projects` so you can load the proje
 ```
 
 ## Architecture
+
+### Intermediate languages
+The main intermediate languages are monadic normal form and three address code.
+
+### Passes
 
 ```mermaid
 graph TD;
