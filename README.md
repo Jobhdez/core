@@ -1,8 +1,8 @@
 # zettapy
 `Zettapy` is a small toy compiler for the core of imperative languages (i.e., loops, if statements, variables, assignment). Currently, it compiles assignment, integer arithmetic, if statements, and while loops to a low level ast; the low level ast consists of the x86 instructions but the instructions do not adhere to the x86 rule that arguments cannot be both stack locations. Tuples and simple functions are also compiled to a low level ast.
 
-## Plan
-Implement if expressions, tuples, and arrays, and functions and register allocation and have the generated assembly run.
+## State of the compiler
+It lowers if statements, while loops, assignment, basic arithmetic, tuples, and high level functions to a low level ast whose instructions are explicit x86-64 instructions.
 
 ## Purpose for writing this compiler
 This compiler was done for fun and to learn about assembly and low level details. Thanks to this project now I have a rough idea of how the assembly looks for the constructs that I implemented. 
