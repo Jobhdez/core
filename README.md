@@ -7,7 +7,6 @@ Implement if expressions, tuples, and arrays, and functions and register allocat
 ## Purpose for writing this compiler
 This compiler was done for fun and to learn about assembly and low level details. Thanks to this project now I have a rough idea of how the assembly looks for the constructs that I implemented. 
 
-Although, there are no tests I tested my code as I wrote it. You can see the examples that run in the `examples.txt` file. But I will implement tests soon.
 
 *Work in progress*
 
@@ -26,6 +25,11 @@ Note: clone this project in `quicklisp/local-projects` so you can load the proje
 (ql:quickload :zetta)
 
 (in-package :zetta)
+```
+**test**
+```
+(ql:quickload :zetta/tests)
+(asdf:test-system :zetta)
 ```
 
 ## Architecture
