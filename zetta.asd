@@ -1,5 +1,5 @@
 (asdf:defsystem #:zetta
-    :description "A Python3 compiler."
+    :description "A compiler for a language with Python syntax."
     :author "Job Hernandez <hj93@protonmail.com>"
     :in-order-to ((asdf:test-op (asdf:test-op #:zetta/tests)))
     :depends-on (#:alexa #:yacc #:alexandria #:trivia)
