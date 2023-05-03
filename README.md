@@ -12,7 +12,13 @@ This compiler was done for fun and to learn about assembly and low level details
 
 ## Getting Started
 **Dependencies**: 
-- SBCL: MacOS:`brew install sbcl`; Ubuntu `sudo apt-get install sbcl`
+- SBCL: 
+
+MacOS:`brew install sbcl`
+
+Ubuntu `sudo apt-get install sbcl`
+
+Arch Linux `sudo pacman -S sbcl`
 - [Quicklisp](https://www.quicklisp.org/beta/)
 
 **Install**:
@@ -26,9 +32,10 @@ Note: clone this project in `quicklisp/local-projects` so you can load the proje
 
 (in-package :zetta)
 ```
-**test**
+**Tests**:
 ```
 (ql:quickload :zetta/tests)
+
 (asdf:test-system :zetta)
 ```
 
