@@ -28,7 +28,7 @@
   (uiop:run-program
    (format nil
            +format-string+
-           http://localhost:4243/compile%3Fexp%3Dif%202%3D%3D2%3A%20x%3D%2030%20%2B%20%20-10%20print(x%20%2B%20%2010)%20else%3A%20y%20%3D%2034%20%2B%20-2%20print(y)")))
+           http://localhost:4243/compile%3Fexp%3Dif%202%3D%3D2%3A%20x%3D%2030%20%2B%20%20-10%20print(x%20%2B%20%2010)%20else%3A%20y%20%3D%2034%20%2B%20-2%20print(y))))
 """
 (defmacro define-route (url view-fn compile-fn ht)
   `(define-easy-handler (,view-fn :uri ,url) (exp)
