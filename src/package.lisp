@@ -10,7 +10,8 @@
 	   #:parse-with-lexer
 	   #:token-generator
 	   #:lex-line
-	   #:*python-grammar
+	   #:*python-grammar*
+	   #:clean
 
 	   #:make-instruction
 	   #:make-atomic-var
@@ -34,3 +35,15 @@
 
 (defpackage #:zetta-var
   (:use))
+
+(defpackage #:python-server
+  (:use #:common-lisp
+	#:hunchentoot
+	#:zetta
+	#:com.inuoe.jzon)
+  (:export #:start-server
+	   #:stop-server
+	   #:*server*
+	   #:launch
+	   #:+format-string+
+	   #:open-browser))

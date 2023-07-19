@@ -2,7 +2,7 @@
     :description "A Python3 compiler."
     :author "Job Hernandez <hj93@protonmail.com>"
     :in-order-to ((asdf:test-op (asdf:test-op #:zetta/tests)))
-    :depends-on (#:alexa #:yacc #:alexandria #:trivia)
+    :depends-on (#:alexa #:yacc #:alexandria #:trivia #:hunchentoot #:com.inuoe.jzon)
     :serial t
     :pathname "src/"
     :components
@@ -16,7 +16,9 @@
       :components ((:file "expose-allocation")
 		   (:file "remove-complex-operands")
 		   (:file "select-instructions")
-		   (:file "assign-homes")))))
+		   (:file "assign-homes")))
+     (:module "server"
+	      :components ((:file "server")))))
 
 (asdf:defsystem #:zetta/tests
   :description "Tests for zetta"
