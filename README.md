@@ -1,5 +1,5 @@
 # zettapy
-`Zettapy` is a small toy compiler for the core of imperative languages. It compiles Python syntax although it is not really Python3.
+`Zettapy` is a small toy compiler for the core of imperative languages. It compiles Python syntax although it is not really Python3. It is also a web service. You will find the server in `src/server`.
 
 ## Progress
 It lowers if statements, while loops, assignment, basic arithmetic, tuples, and high level functions to a low level ast whose instructions are explicit x86-64 instructions.
@@ -51,7 +51,9 @@ graph TD;
     Source-Program-->Parse-Tree;
     Parse-Tree-->Remove-Complex-Operands;
     Remove-Complex-Operands-->Instruction-Selection;
-    Instruction-Selection-->assign-homes;
+    Instruction-Selection-->Assign-Homes;
+    Assign-Homes-->x86-AST;
+
 ```
 ## Example
 
