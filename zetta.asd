@@ -7,16 +7,17 @@
     :pathname "src/"
     :components
     ((:file "package")
-     (:module "lexer"
-	      :components ((:file "lexer")))
-     (:module "parser"
-	      :components ((:file "parser")
-			   (:file "ast")))
-     (:module "passes"
-      :components ((:file "expose-allocation")
-		   (:file "remove-complex-operands")
-		   (:file "select-instructions")
-		   (:file "assign-homes")))
+     (:module "compiler"
+	      :components ((:module "lexer"
+				    :components ((:file "lexer")))
+			   (:module "parser"
+				    :components ((:file "parser")
+						 (:file "ast")))
+			   (:module "passes"
+				    :components ((:file "expose-allocation")
+						 (:file "remove-complex-operands")
+						 (:file "select-instructions")
+						 (:file "assign-homes")))))
      (:module "server"
 	      :components ((:file "server")))))
 
