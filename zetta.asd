@@ -4,19 +4,21 @@
     :in-order-to ((asdf:test-op (asdf:test-op #:zetta/tests)))
     :depends-on (#:alexa #:yacc #:alexandria #:trivia #:hunchentoot #:com.inuoe.jzon)
     :serial t
-    :pathname "src/"
+    :pathname "zetta/"
     :components
     ((:file "package")
-     (:module "lexer"
-	      :components ((:file "lexer")))
-     (:module "parser"
-	      :components ((:file "parser")
-			   (:file "ast")))
-     (:module "passes"
-      :components ((:file "expose-allocation")
-		   (:file "remove-complex-operands")
-		   (:file "select-instructions")
-		   (:file "assign-homes")))
+     (:module "compiler"
+	      :components
+	      ((:module "lexer"
+		       :components ((:file "lexer")))
+	      (:module "parser"
+		       :components ((:file "parser")
+				    (:file "ast")))
+	      (:module "passes"
+		       :components ((:file "expose-allocation")
+				    (:file "remove-complex-operands")
+				    (:file "select-instructions")
+				    (:file "assign-homes")))))
      (:module "server"
 	      :components ((:file "server")))))
 
