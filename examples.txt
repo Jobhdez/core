@@ -290,6 +290,10 @@ movq rdi rax
 callq print_int
 ret
 
+;;; more complex example
+;;; as of 8/24 my compiler's instruction selection system doesnt generate the instructions. When I first implemented 
+;;; I didnt think about the body of the while being an if statement. so what i need to do is have a base ie simple instructions and for the rest
+;;; just apply recursion. also, i might just need to implement dynamic programming to generate good code. take a look at the dragon book 2nd edition.
 def test(x, y):
    n = 10
    while x < 20:
