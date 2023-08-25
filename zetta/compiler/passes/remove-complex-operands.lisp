@@ -187,7 +187,7 @@
 		 ((py-while :prestatements pres
 			    :exp e1
 			    :body-statements body)
-		  (make-while-atomic :loop-block (mapcar (lambda (n) (remove-complex n)) body)
+		  (make-while-atomic :loop-block (mapcar (lambda (n) (remove-complex n)) (if (listp body) body (list body)))
 				     :test-block e1
 				     :pre-block (mapcar (lambda (n) (remove-complex n))
 							(if (listp pres)
