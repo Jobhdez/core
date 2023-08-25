@@ -1,8 +1,28 @@
 # zettapy
-`Zettapy` is a small toy compiler for the core of imperative languages. It compiles Python syntax although it is not really Python3. It is also a web service. You will find the server in `src/server`.
+`Zettapy` is a small toy compiler for the core of imperative languages based on the excellent book "Essentials of Compilation" by Dr. Siek.
 
 ## Progress
-It lowers if statements, while loops, assignment, basic arithmetic, tuples, and high level functions to a low level ast whose instructions are explicit x86-64 instructions.
+It lowers:
+   -   if statements
+   -   while loops
+   -   assignment
+   -   basic arithmetic
+   -   tuples; and
+   -   high level functions
+
+to a low level AST whose instructions are explicit x86-64 instructions.
+
+### TODO
+I still need to implement:
+   - if expressions
+   - register allocation
+   - generate the x86 from x86 AST
+
+When I am done with this TODO I would have implemented every chapter from the textbook "Essentials of Compilation" by Dr. Siek covered in a quarter compiler course.
+
+If I have time I will implement:
+   - lexical scope functions
+   - make compiler into a proper dynamic laguage
 
 ## Purpose for writing this compiler
 This compiler was done for fun and to learn about assembly and low level details. Thanks to this project now I have a rough idea of how the assembly looks for the constructs that I implemented. 
