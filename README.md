@@ -1,5 +1,5 @@
 # zettapy
-`Zettapy` is a small toy compiler for the core of imperative languages based on the excellent book "Essentials of Compilation" by Dr. Siek.
+`Zettapy` is do far a small and very limited toy compiler for the core of imperative languages based on the excellent book "Essentials of Compilation" by Dr. Siek. This compiler only compiles very basic programs to an x86 AST.
 
 ## Progress
 It lowers:
