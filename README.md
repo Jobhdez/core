@@ -17,6 +17,7 @@ I still need to implement:
    - if expressions
    - register allocation
    - generate the x86 from x86 AST
+   - compile programs with nested non assignment and non primitive statements - i.e this compiler doesnt work at all.
 
 When I am done with this TODO I would have implemented every chapter from the textbook "Essentials of Compilation" by Dr. Siek covered in a quarter compiler course.
 
