@@ -18,9 +18,7 @@
 		       :components ((:file "expose-allocation")
 				    (:file "remove-complex-operands")
 				    (:file "select-instructions")
-				    (:file "assign-homes")))))
-     (:module "server"
-	      :components ((:file "server")))))
+				    (:file "assign-homes")))))))
 
 (asdf:defsystem #:zetta/tests
   :description "Tests for zetta"
