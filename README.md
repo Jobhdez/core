@@ -1,7 +1,6 @@
 # zettapy
-`Zettapy` is do far a small and very limited toy compiler for the core of imperative languages based on the excellent book "Essentials of Compilation" by Dr. Siek. This compiler only compiles very basic programs to an x86 AST.
+`Zettapy` is do far a small and very limited toy compiler for the core of imperative languages based on the excellent book "Essentials of Compilation" by Dr. Siek. This compiler only compiles very basic programs to an x86 AST. In other words this project was a quick experiment and since it generates an x86 AST this compiler is not meant to be run.
 
-## Progress
 It lowers:
    -   if statements
    -   while loops
@@ -12,24 +11,8 @@ It lowers:
 
 to a low level AST whose instructions are explicit x86-64 instructions.
 
-### TODO
-I still need to implement:
-   - if expressions
-   - register allocation
-   - generate the x86 from x86 AST
-   - compile programs with nested non assignment and non primitive statements - i.e this compiler doesnt work at all.
-
-When I am done with this TODO I would have implemented every chapter from the textbook "Essentials of Compilation" by Dr. Siek covered in a quarter compiler course.
-
-If I have time I will implement:
-   - lexical scope functions
-   - make compiler into a proper dynamic laguage
-
 ## Purpose for writing this compiler
-This compiler was done for fun and to learn about assembly and low level details. Thanks to this project now I have a rough idea of how the assembly looks for the constructs that I implemented. 
-
-
-*Work in progress*
+This compiler was done for fun and to learn about assembly and low level details. Thanks to this project now I have a rough idea of how the assembly looks for the constructs that I implemented. This project was a quick experiment to get an idea of how to to build a compiler and I accomplished this goal so I am not going to keep improving it.:) 
 
 ## Getting Started
 **Dependencies**: 
