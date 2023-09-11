@@ -15,11 +15,12 @@ to a low level AST whose instructions are explicit x86-64 instructions.
 This compiler was done for fun and to learn about assembly and low level details. Thanks to this project now I have a rough idea of how the assembly looks for the constructs that I implemented. This project was a quick experiment to get an idea of how to to build a compiler. My initial intention was to quickly generate the x86 AST for some simple programs -- i.e., the constructs above in isolation. As a result, nested constructs cannot be compiled.
 
 ## Lessons
-If I were to start from scratch this what I would do differently. While building this I was too narrow focused; that is I was thinking very concretely and specific use cases; for example, I only tested if statements in isolation but I never tested an if statement with nested if statements or a while loop with nested if statements and so on. I think if I would have been more general in my approach I would have captured a pattern.
+If I were to start from scratch this what I would do differently. While building this compiler I was too narrow focused; that is I was thinking very concretely and in specific use cases; for example, I only tested if statements in isolation but I never tested an if statement with nested if statements or a while loop with nested if statements and so on. I think if I would have been more general in my approach I would have captured a pattern.
 
-Another thing I am learning is that your technical decisions will follow you, so to speak, thoughout the developement of the project; for example, in this project I would have to re-write a lot of things to do it the correct way.
+Another thing I am learning is that your technical decisions will follow you, so to speak, thoughout the developement of the project; for example, in this project I would have to re-write a lot of things to do it the correct way. So good decisions in the beginning of the development process leads to better maintainment.
 
 I also did not construct the ast properly and so I had to hack things together in later passes; for instance `cpm` is not contructed properly. In addition, assignment was not constructed.
+
 ## Getting Started
 **Dependencies**: 
 - SBCL: 
