@@ -8,8 +8,8 @@
     (declare (ignore print-token left-paren-token right-paren-token))
     (make-py-print :exp exp))
 
-  (defun build-while (pre-statem while-token exp colon-tok statements)
-    (declare (ignore while-token colon-tok))
+  (defun build-while (pre-statem while-token exp colon-tok statements semicolon-tok)
+    (declare (ignore while-token colon-tok semicolon-tok))
     (make-py-while :prestatements pre-statem :exp exp :body-statements statements))
 
   (defun build-if (if-token exp colon-tok statement else-tok colon2-tok statement2)
@@ -88,7 +88,7 @@
      function
      exp
      assignment
-     (statements :while exp :colon statements #'build-while)
+     (statements :while exp :colon statements :semicolon #'build-while)
      (:if exp :colon statements :else :colon statements #'build-if))
     (function
      (:def variable :left-paren args :right-paren :colon statements :semicolon #'build-function))
