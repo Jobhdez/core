@@ -294,7 +294,10 @@ ret
 ;;; as of 8/24 my compiler's instruction selection system doesnt generate the instructions. When I first implemented 
 ;;; I didnt think about the body of the while being an if statement. so what i need to do is have a base ie simple instructions and for the rest
 ;;; just apply recursion. also, i might just need to implement dynamic programming to generate good code. take a look at the dragon book 2nd edition.
-def test(x, y):
+
+;; update: 9/11
+;; this compiles now through the `select-instructions` pass but cant tell the x86 is correct:)
+def test(x y):
    n = 10
    while x < 20:
       if x < n:
@@ -302,7 +305,7 @@ def test(x, y):
 	 print(j+10)
        else:
          j = 10 + -6
-	 print(j + 3);
+	 print(j + 3);;
 
 -------
 sum = 0
