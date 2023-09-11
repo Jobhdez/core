@@ -12,7 +12,7 @@ It lowers:
 to a low level AST whose instructions are explicit x86-64 instructions.
 
 ## Purpose for writing this compiler
-This compiler was done for fun and to learn about assembly and low level details. Thanks to this project now I have a rough idea of how the assembly looks for the constructs that I implemented. This project was a quick experiment to get an idea of how to to build a compiler and I accomplished this goal so I am not going to keep improving it.:) 
+This compiler was done for fun and to learn about assembly and low level details. Thanks to this project now I have a rough idea of how the assembly looks for the constructs that I implemented. This project was a quick experiment to get an idea of how to to build a compiler. My initial intention was to quickly generate the x86 AST for some simple programs -- i.e., the constructs above in isolation. As a result, nested constructs cannot be compiled.
 
 ## Getting Started
 **Dependencies**: 
@@ -183,10 +183,8 @@ graph TD;
  #S(CALLQ :LABEL "print_int"))
 
 ```
-## Disclaimer
-Currently, the compiler generates a low level ast consisting of explicit x86 instructions so you will not be able to run the assembly yet 
 
 ## Acknowledgements
-this compiler is loosely based on the Python compiler skeleton (written in Python) in the textbook [Essentials of Compilation](https://github.com/IUCompilerCourse/Essentials-of-Compilation). None of the Python code was ported into common lisp. I essentially solved the exercises and wrote my code in a different language.
+This compiler is loosely based on the Python compiler skeleton (written in Python) in the textbook [Essentials of Compilation](https://github.com/IUCompilerCourse/Essentials-of-Compilation). None of the Python code was ported into common lisp. I essentially solved the exercises and wrote my code in a different language.
 
 thanks
