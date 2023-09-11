@@ -207,7 +207,13 @@
 					      for j in (list "rdi" "rsi" "rdx" "rcx" "r8" "r9")
 					      collect (make-instruction :name "movq" :arg1 j :arg2 i))
 					
-					(make-from-atomic-assignments statements))))))
+					(make-from-atomic-assignments statements))))
+			(t
+			  (flatten (list (loop for i in (if (listp args) args (list args))
+					      for j in (list "rdi" "rsi" "rdx" "rcx" "r8" "r9")
+					       collect (make-instruction :name "movq" :arg1 j :arg2 i))
+					 (select-instructions statements))))))
+					 
 
 		 ((function-call :var var :exp exp)
 		  (let ((fn-name (generate-fn-name "fun")))
