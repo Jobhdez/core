@@ -1,0 +1,29 @@
+'(let ((g25221 (< x 1)))
+   (let ((g25222 (if g25221 (= x 0) (= x 2))))
+     (if g25222 (+ y 2) (+ y 2))))
+
+
+for i in let_exps:
+  
+
+cpmq x 1
+je b1
+jmp b2
+
+b1;
+cpmq x 0
+je b3
+jmp b4
+
+b2;
+cmpq x 2
+je b3
+jmp b4
+
+b3;
+movq y stack1
+addq 2 stack1
+
+b4;
+movq y stack1
+addq 2 stack1
