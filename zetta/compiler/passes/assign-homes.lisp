@@ -167,6 +167,10 @@
 		       (make-instruction :name name
 					 :arg1 (make-immediate :int (py-constant-num a1))
 					 :arg2 a2))
+		      ((and (stringp a1) (py-var-p a2))
+		       (make-instruction :name name
+					  :arg1 a1
+					 :arg2 (make-atomic-var :name (py-var-name a2))))
 		      (t
 		       instr)))
 	       ((block-py :name name)
