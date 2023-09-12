@@ -261,7 +261,7 @@
 			((equalp "<" (string-upcase compare))
 			 (list (make-instruction :name "cmpq"
 						 :arg1 e2
-						 :arg1 e1))))))))
+						 :arg2 e1))))))))
       (alexandria::flatten (mapcar (lambda (n) (select-instrs n)) ast)))))
 
 
