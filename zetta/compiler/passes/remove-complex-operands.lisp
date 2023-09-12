@@ -208,7 +208,8 @@
 			    assign1
 			    assign2
 			    exps2
-			    (make-py-cmp :lexp temp2 :cmp cmp :rexp temp3))))))
+			    (make-py-cmp :lexp temp2 :cmp cmp :rexp temp3))))
+			(t parse-node)))
 		 (_ (error "no valid expression."))))
 	     (generate-temp-name (prefix-name)
 	       (progn (setf gensym-count (+ gensym-count 1))
