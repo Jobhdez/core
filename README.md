@@ -7,7 +7,7 @@ It lowers:
    -   assignment
    -   basic arithmetic
    -   tuples; and
-   -   high level functions
+   -   top level functions
 
 to a low level AST whose instructions are explicit x86-64 instructions.
 
