@@ -103,6 +103,56 @@ Compiles to the following x86 AST:
  #S(INSTRUCTION :NAME "cmpq" :ARG1 #S(IMMEDIATE :INT 20) :ARG2 "-8(%rbp)"))
 ```
 
+The above x86 AST is a bit off. The x86 should look like this (an example that runs):
+
+```assembly
+	.globl main
+main:
+	pushq %rbp
+	movq %rsp, %rbp
+	subq $48, %rsp
+	movq $10, %rbx
+	movq $0, %r15
+	jmp test
+
+test:
+	cmpq $20, %r15
+	jge exit
+
+	cmp %rbx, %r15
+	jl block_1
+	jmp block_2
+block_1:	
+	movq $10, -8(%rbp)
+	movq $3, -16(%rbp)
+	negq -16(%rbp)
+	movq -16(%rbp), %rax
+	addq -8(%rbp), %rax
+	movq $10, -32(%rbp)
+	addq -32(%rbp), %rax
+	movq %rax, %rdi
+	callq print_int
+	incq %r15
+	jmp test
+
+block_2:
+	movq $10, -8(%rbp)
+	movq $6, -16(%rbp)
+	negq -16(%rbp)
+	movq -16(%rbp), %rax
+	addq -8(%rbp), %rax
+	movq %rax, %rdi
+	callq print_int
+	incq %r15
+	jmp test
+	
+
+exit:
+	addq $48, %rsp
+	popq %rbp
+	retq
+	
+```
 ## Acknowledgements
 This compiler is loosely based on the Python compiler skeleton (written in Python) in the textbook [Essentials of Compilation](https://github.com/IUCompilerCourse/Essentials-of-Compilation). None of the Python code was ported into common lisp. I essentially solved the exercises and wrote my code in a different language.
 
