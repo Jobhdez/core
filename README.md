@@ -68,9 +68,11 @@ def test(x y):
       if x < n:
          j = 10 + -3
 	 print(j+10)
+         x=x+1
        else:
          j = 10 + -6
-	 print(j + 3);;
+	 print(j + 3)
+         x = x+1;;
 ```
 
 Compiles to the following x86 AST:
