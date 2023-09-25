@@ -1,8 +1,5 @@
 (in-package #:zetta)
 
-;(defparameter *registers* (make-hash-table :test 'equal))
-;(defparameter *expressions* (make-hash-table))
-
 (defstruct immediate
   int)
 
