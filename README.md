@@ -11,6 +11,8 @@ It lowers:
 
 to a low level AST whose instructions are explicit x86-64 instructions.
 
+## todo
+rewrite it in racket
 ## Purpose for writing this compiler
 This compiler was done for fun and to learn about assembly and low level details. Thanks to this project now I have a rough idea of how the assembly looks for the constructs that I implemented. This project was a quick experiment to get an idea of how to to build a compiler. My initial intention was to quickly generate the x86 AST for some simple programs.
 
