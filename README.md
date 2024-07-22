@@ -1,20 +1,9 @@
-# zettapy
-`Zettapy` is a small and very limited toy compiler for the core of imperative languages based on the excellent book "Essentials of Compilation" by Dr. Siek. This compiler only compiles very basic programs to an x86 AST. In other words this project was a quick experiment and since it generates an x86 AST this generated code is not meant to be run.
+# Core
 
-It lowers:
-   -   if statements
-   -   while loops
-   -   assignment
-   -   basic arithmetic
-   -   tuples; and
-   -   top level functions
 
-to a low level AST whose instructions are explicit x86-64 instructions.
+`core` is a small compiler that lowers core imperative programming features to runnable x86. It supports: variables, assignment, if statements, while loops.
 
-## todo
-rewrite it in racket
-## Purpose for writing this compiler
-This compiler was done for fun and to learn about assembly and low level details. Thanks to this project now I have a rough idea of how the assembly looks for the constructs that I implemented. This project was a quick experiment to get an idea of how to to build a compiler. My initial intention was to quickly generate the x86 AST for some simple programs.
+*note* dev is in progress ...
 
 ## Getting Started
 **Dependencies**: 
