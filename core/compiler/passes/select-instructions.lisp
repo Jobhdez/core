@@ -125,24 +125,6 @@
 						 :arg2 'no-arg)))
 			(t (error "E1 isnt a constant."))))
 
-		 ((if-atomic :block b1 :begin-then bthen :begin-else bels :condition e)
-		  (let* ((set-instrs1 (mapcar (lambda (instr) (select-instrs instr))
-					      (if (listp bthen)
-						  bthen
-						  (list bthen))))
-			 (set-instrs2 (mapcar (lambda (instr) (select-instrs instr))
-					      (if (listp bels)
-						  bels
-						  (listp bels))))
-			 (conditional (select-instrs e)))
-		    (list conditional
-			  (make-instruction :name "je" :arg1 b1 :arg2 'no-arg)
-			  (make-instruction :name "jmp" :arg1 "block_2" :arg2 'no-arg)
-			  (make-block-py :name b1)
-			  set-instrs1
-			  (make-block-py :name "block_2")
-			  set-instrs2)))
-
 		 ((while-atomic :loop-block loopb :test-block testb :pre-block preb)
 		  (let ((setloopb (mapcar (lambda (n) (select-instrs n)) (if (listp loopb) loopb (list loopb))))
 			(settestb (mapcar (lambda (n) (select-instrs n)) (if (listp testb) testb (list testb))))
