@@ -12,10 +12,9 @@
   name)
 
 (defstruct if-atomic
-  block
-  begin-then
-  begin-else
-  condition)
+  thn
+  els
+  cnd)
 
 (defstruct while-atomic
   loop-block
@@ -138,20 +137,9 @@
 
 			(t (error "No other print expressions."))))
 		 ((py-if :exp e :if-statement ifs :else-statement els)
-		  (cond ((and (py-cmp-p e) (collect-p els))
-			 (let ((rmv-py-cmp (remove-complex e)))
-			   (list (first rmv-py-cmp)
-				 (second rmv-py-cmp)
-				 (third rmv-py-cmp)
-				 (make-if-atomic :block "block_1"
-						 :begin-then ifs
-						 :begin-else els
-						 :condition (fourth rmv-py-cmp)))))
-			(t
-			 (make-if-atomic :block "block_1"
-					 :begin-then (flatten (mapcar (lambda (instr) (remove-complex instr)) ifs))
-					 :begin-else (flatten (mapcar (lambda (instr) (remove-complex instr)) els))
-					 :condition e))))
+		  (make-if-atomic :thn (flatten (mapcar (lambda (instr) (remove-complex instr)) ifs))
+				  :els (flatten (mapcar (lambda (instr) (remove-complex instr)) els))
+			          :cnd e))
 
 		 ((py-while :prestatements pres
 			    :exp e1
