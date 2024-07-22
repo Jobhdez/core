@@ -71,7 +71,7 @@
     (declare (ignore lparen-tok rparen-tok))
     (make-function-call :var var :exp exp))
 
-  (define-parser *python-grammar*
+  (define-parser *core-grammar*
       (:start-symbol module)
     (:terminals (:boolop :unaryop  :left-bracket :right-bracket :cmp :tuple :bool :assignment :if :else :while :colon :name :constant :comma :right-paren :left-paren :print :plus :minus :def :semicolon))
     (module
