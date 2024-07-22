@@ -34,24 +34,8 @@
 	       (match parse-node
 		 ((py-constant :num n)
 		  (make-py-constant :num n))
-
-		 ((global-value :arg1 a1)
-		  (let ((temp-name (generate-temp-name "temp_")))
-		    (make-atomic-assignment :temp-var temp-name
-					    :n (make-global-value :arg1 a1))))
-
-		 ((py-function :name f :args args :statements statements)
-		  (make-py-function :name f
-				    :args args
-				    :statements (flatten (mapcar (lambda (instr) (remove-complex instr)) (if (listp statements) statements (list statements))))))
 		 
-		 ((function-call :var v :exp e)
-		  parse-node)
-
-		 ((collect :bytes bytes)
-		  (collect :bytes bytes))
-		 
-		 ((py-neg-num :num n)
+     		 ((py-neg-num :num n)
 		  (make-atomic-assignment :temp-var (make-atomic-var :name (generate-temp-name "temp_"))
 					  :n (make-py-neg-num :num n)))
 		 
@@ -81,15 +65,7 @@
 		                       (tmp-var (atomic-assignment-temp-var rmv-complex)))
 				  (list rmv-complex
 					(make-atomic-sum :lexp tmp-var
-							 :rexp (remove-complex e2)))))))
-			((and (global-value-p e1) (py-constant-p e2))
-			 (let* ((temp-name (generate-temp-name "temp*_"))
-				(temp-name2 (generate-temp-name "temp*_")))
-			   (list (make-atomic-assignment  :temp-var temp-name
-							  :n e1)
-			         (make-atomic-assignment :temp-var temp-name2
-							 :n (make-atomic-sum :lexp temp-name
-									     :rexp e2)))))))
+							 :rexp (remove-complex e2)))))))))
 
 		 ((begin :statements statements)
 		  (mapcar (lambda (instr) (remove-complex instr)) statements))
@@ -114,10 +90,7 @@
 
 			
 
-			((allocate-p e)
-			 (make-py-assignment :name (make-atomic-var :name name)
-					     :exp e))
-			
+		       
 			((py-sum-p e)
 			 (cond ((positive-sum-p e)
 				e)
