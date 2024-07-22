@@ -1,6 +1,6 @@
-(in-package #:zetta-tests)
+(in-package #:core-tests)
 
-(defun run-zetta-tests ()
+(defun run-core-tests ()
   (run-package-tests
-   :packages '(:zetta-tests)
+   :packages '(:core-tests)
    :interactive t))
