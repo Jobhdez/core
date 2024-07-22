@@ -14,7 +14,7 @@
 
   (defun build-if (if-token exp colon-tok statement else-tok colon2-tok statement2)
     (declare (ignore if-token colon-tok else-to colon2-tok))
-    (make-py-if :exp exp :if-statement statement :else-statement statement2))
+    (make-py-if :exp exp :if-statement (if (listp statement) (flatten statement) statement) :else-statement (if (listp statement2) (flatten statement2) statement2)))
 
   (defun build-neg-num (minus-token exp)
     (declare (ignore minus-token))
