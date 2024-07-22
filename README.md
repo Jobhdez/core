@@ -33,8 +33,3 @@ Note: clone this project in `quicklisp/local-projects` so you can load the proje
 
 (asdf:test-system :core)
 ```
-```
-## Acknowledgements
-This compiler is loosely based on the Python compiler skeleton (written in Python) in the textbook [Essentials of Compilation](https://github.com/IUCompilerCourse/Essentials-of-Compilation). None of the Python code was ported into common lisp. I essentially solved the exercises and wrote my code in a different language.
-
-thanks
