@@ -88,7 +88,7 @@
 		       
 			((py-sum-p e)
 			 (cond ((positive-sum-p e)
-				e)
+				(make-py-assignment :name (make-atomic-var :name name) :exp (car (flatten (remove-complex e)))))
 
 			       ((and (py-var-p (py-sum-lexp e))
 				     (py-constant-p (py-sum-rexp e)))
