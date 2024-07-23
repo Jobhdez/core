@@ -29,7 +29,7 @@
 		    (progn
 		      (setf (gethash blk-thn blocks) (if (listp thn) (mapcar (lambda (e) (toc e)) thn) thn))
 		      (setf (gethash blk-els blocks) (if (listp els) (mapcar (lambda (e) (toc e)) els) els))
-		      (list (make-if-goto :cnd (toc cnd) :thn (make-goto :block blk-thn) :els (make-goto :block blk-els) :blocks blocks)))))
+		      (make-if-goto :cnd (toc cnd) :thn (make-goto :block blk-thn) :els (make-goto :block blk-els) :blocks blocks))))
 			
 		 
 		 (_ instr))))
