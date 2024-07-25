@@ -1,5 +1,5 @@
 (asdf:defsystem #:core
-  :description "A compiler for the core of imperative features"
+  :description "A compiler for core imperative constructs"
   :author "Job Hernandez <hj93@protonmail.com>"
   :in-order-to ((asdf:test-op (asdf:test-op #:core/tests)))
   :depends-on (#:alexa #:yacc #:alexandria #:trivia #:hunchentoot #:com.inuoe.jzon)
