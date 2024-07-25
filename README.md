@@ -1,7 +1,6 @@
 # Core
 
-
-`core` is a small compiler that lowers core imperative programming features to runnable x86. It supports: variables, assignment, if statements, while loops.
+`core` is a small compiler that lowers, so far, core imperative programming features to an x86 AST. It supports: variables, assignment, if statements, while loops.
 
 *note* dev is in progress ...
 
