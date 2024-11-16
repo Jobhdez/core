@@ -17,12 +17,12 @@
 		 ((while-atomic :loop-block blk :test-block tblk :pre-block pblk)
 		  (let ((loop-block (concatenate 'string "loop_" (write-to-string (setf counter (+ counter 1))))))
 		    (progn
-		      (setf (gethash loop-block blocks) (toc tblk))
 		      (setf (gethash loop-block blocks) (mapcar (lambda (e) (toc e)) blk))
 		      (let ((goto* (make-if-goto-loop :cnd (toc tblk) :body (make-goto :block loop-block) :blocks blocks)))
 			(flatten
-			 (list (mapcar (lambda (e) (toc e)) pblk)
-			       goto*))))))
+			 (flatten
+			  (list (mapcar (lambda (e) (toc e)) pblk)
+			        goto*)))))))
 		      
 		 ((if-atomic :thn thn :els els :cnd cnd)
 		  (let ((blk-thn (concatenate 'string "block_" (write-to-string (setf counter (+ counter 1)))))
@@ -34,6 +34,6 @@
 		      
 		 (_ instr))))
 	    
-      (mapcar (lambda (instr) (toc instr)) anf))))
+      (flatten (mapcar (lambda (instr) (toc instr)) anf)))))
 		      
 	 
