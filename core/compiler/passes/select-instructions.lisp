@@ -124,6 +124,21 @@
 						 :arg1 'no-arg
 						 :arg2 'no-arg)))
 			(t (error "E1 isnt a constant."))))
+		 
+		 ((if-goto-loop :cnd cnd :body loop-block :blocks blks)
+		  (let ((blk1 (goto-block loop-block)))
+		    (let ((body (gethash blk1 blks)))
+		      (let ((cmp (py-cmp-cmp cnd)))
+			(cond ((equalp "<" (string-upcase cmp))
+			      (list (mapcar (lambda (e) (select-instrs e)) body)
+				    (make-instruction :name "cmpq" :arg1 (make-immediate :int (py-cmp-rexp cnd)) :arg2 (make-atomic-var :name (py-var-name (py-cmp-lexp cnd))))
+				    (make-instruction :name "jl" :arg1 blk1 :arg2 'no-arg)))
+			      (t
+			       (list (mapcar (lambda (e) (select-instrs e)) body)
+				    (make-instruction :name "cmpq" :arg1 (make-immediate :int (py-cmp-rexp cnd)) :arg2 (make-atomic-var :name (py-var-name (py-cmp-lexp cnd))))
+				    (make-instruction :name "jg" :arg1 blk1 :arg2 'no-arg))))))))
+				    
+		  
 		 ((if-goto :cnd cnd :thn thn :els els :blocks blks)
 		  (let ((blk1 (goto-block thn))
 			(blk2 (goto-block els)))
