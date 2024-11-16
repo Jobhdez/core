@@ -92,8 +92,8 @@
 
 			       ((and (py-var-p (py-sum-lexp e))
 				     (py-constant-p (py-sum-rexp e)))
-				(make-atomic-sum :lexp (py-var-name (py-sum-lexp e))
-						 :rexp (py-constant-num (py-sum-rexp e))))
+				(make-py-assignment :name (py-var-name (py-sum-lexp e))
+						 :exp e))
 			       
 			       ((variable-sum-p e)
 				(make-py-assignment :name (make-atomic-var :name name) :exp e))
