@@ -49,14 +49,27 @@
 					   :arg2 var-name))
 
 			((py-sum-p e1)
-			 (let ((tmp-var (py-sum-rexp e1)))
-			   (list (make-instruction :name "movq"
-						   :arg1 (py-sum-lexp e1)
-						   :arg2 var-name)
-				 (make-instruction :name "addq"
-						   :arg1 (py-sum-rexp e1)
-						   :arg2 var-name))))
-
+			 (cond ((and (py-var-p (py-sum-lexp e1))
+				     (py-var-p (py-sum-rexp e1)))
+				(let ((lvar (py-var-name (py-sum-lexp e1)))
+				      (rvar (py-var-name (py-sum-rexp e1))))
+				  (list (make-instruction :name "movq"
+							  :arg1 (make-atomic-var :name rvar)
+							  :arg2 "%rax")
+					(make-instruction :name "addq"
+							  :arg1 "%rax"
+							  :arg2 (make-atomic-var :name lvar)))))
+			       
+			       ((and (py-constant-p (py-sum-rexp e1))
+				     (py-var-p (py-sum-lexp e1)))
+				(let ((lnum (py-constant-num (py-sum-rexp e1)))
+				      (rvar (py-var-name (py-sum-lexp e1))))
+				  (list (make-instruction :name "movq"
+							  :arg1 (make-immediate :int lnum)
+							  :arg2 "%rax")
+					(make-instruction :name "addq"
+							  :arg1 "%rax"
+							  :arg2 (make-atomic-var :name rvar)))))))
 			((py-sub-p e1)
 			 (let ((var (py-sub-lexp e1)))
 			   (if (py-var-p var)
@@ -230,3 +243,31 @@
 
 
 
+(defun select (exp)
+  (let ((ast (parse-with-lexer (token-generator (lex-line exp)) *core-grammar*)))
+    (let ((anf (remove-complex-operands ast)))
+      (let ((cir (to-cir anf)))
+	(select-instructions cir)))))
+
+(defun ast->assembly (instructions)
+  (labels ((toassembly (in)
+             (match in
+               ((instruction :name name :arg1 a1 :arg2 a2)
+                (cond 
+                 ((and (immediate-p a1) (stringp a2))
+                  (concatenate 'string (string #\Tab) name " " 
+                               (write-to-string (immediate-int a1)) ", " 
+                               a2 (string #\Newline)))
+      
+                 ((and (stringp a1) (stringp a2))
+                  (concatenate 'string (string #\Tab) name " " 
+                               a1 ", " a2 (string #\Newline)))
+                 
+                 ((and (equalp name "jl") (stringp a1))
+                  (concatenate 'string (string #\Tab) "jl " 
+                               a1 (string #\Newline)))
+                 
+                 (t 
+                  (error "Unsupported instruction format: ~A" in)))))))
+    
+    (apply #'concatenate 'string (mapcar #'toassembly instructions))))
