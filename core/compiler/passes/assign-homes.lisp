@@ -173,8 +173,8 @@
 					 :arg2 a2))
 		      ((and (stringp a1) (py-var-p a2))
 		       (make-instruction :name name
-					  :arg1 a1
-					  :arg2 (make-atomic-var :name (py-var-name a2))))
+					 :arg1 a1
+					 :arg2 (make-atomic-var :name (py-var-name a2))))
 		      ((and (py-var-p a1) (py-var-p a2))
 		       (make-instruction :name name
 					 :arg1 (make-atomic-var :name (py-var-name a1))
@@ -186,11 +186,11 @@
 					 :arg2 (make-atomic-var :name (py-var-name a2))))
 
 		      ((immediate-p a1)
-		      (if (py-constant-p (immediate-int a1))
-			  (make-instruction :name name
-					    :arg1 (make-immediate :int (py-constant-num (immediate-int a1)))
-					    :arg2 a2)
-			  instr))
+		       (if (py-constant-p (immediate-int a1))
+			   (make-instruction :name name
+					     :arg1 (make-immediate :int (py-constant-num (immediate-int a1)))
+					     :arg2 a2)
+			   instr))
 		      
 		      (t
 		       instr)))

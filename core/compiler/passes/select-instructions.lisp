@@ -143,15 +143,15 @@
 		    (let ((body (gethash blk1 blks)))
 		      (let ((cmp (py-cmp-cmp cnd)))
 			(cond ((equalp "<" (string-upcase cmp))
-			      (list (mapcar (lambda (e) (select-instrs e)) body)
-				    (make-instruction :name "cmpq" :arg1 (make-immediate :int (py-cmp-rexp cnd)) :arg2 (make-atomic-var :name (py-var-name (py-cmp-lexp cnd))))
-				    (make-instruction :name "jl" :arg1 blk1 :arg2 'no-arg)))
+			       (list (mapcar (lambda (e) (select-instrs e)) body)
+				     (make-instruction :name "cmpq" :arg1 (make-immediate :int (py-cmp-rexp cnd)) :arg2 (make-atomic-var :name (py-var-name (py-cmp-lexp cnd))))
+				     (make-instruction :name "jl" :arg1 blk1 :arg2 'no-arg)))
 			      (t
 			       (list (mapcar (lambda (e) (select-instrs e)) body)
-				    (make-instruction :name "cmpq" :arg1 (make-immediate :int (py-cmp-rexp cnd)) :arg2 (make-atomic-var :name (py-var-name (py-cmp-lexp cnd))))
-				    (make-instruction :name "jg" :arg1 blk1 :arg2 'no-arg))))))))
-				    
-		  
+				     (make-instruction :name "cmpq" :arg1 (make-immediate :int (py-cmp-rexp cnd)) :arg2 (make-atomic-var :name (py-var-name (py-cmp-lexp cnd))))
+				     (make-instruction :name "jg" :arg1 blk1 :arg2 'no-arg))))))))
+		 
+		 
 		 ((if-goto :cnd cnd :thn thn :els els :blocks blks)
 		  (let ((blk1 (goto-block thn))
 			(blk2 (goto-block els)))
@@ -167,14 +167,14 @@
 				     (make-block-py :name blk2)
 				     (if (listp exp-els) (mapcar (lambda (e) (select-instrs e)) exp-els) (select-instrs exp-els))))
 			      (t
-			        (list (make-instruction :name "cmpq" :arg1 (make-immediate :int (py-cmp-rexp cnd)) :arg2 (make-immediate :int (py-cmp-lexp cnd)))
+			       (list (make-instruction :name "cmpq" :arg1 (make-immediate :int (py-cmp-rexp cnd)) :arg2 (make-immediate :int (py-cmp-lexp cnd)))
 				     (make-instruction :name "jg" :arg1 blk1 :arg2 'no-arg)
 				     (make-instruction :name "jmp" :arg1 blk2 :arg2 'no-arg)
 				     (make-block-py :name blk1)
 				     (if (listp exp-thn) (mapcar (lambda (e) (select-instrs e)) exp-thn) (select-instrs exp-thn))
 				     (make-block-py :name blk2)
 				     (if (listp exp-els) (mapcar (lambda (e) (select-instrs e)) exp-els) (select-instrs exp-els)))))))))
-			      
+		 
 		 ((while-atomic :loop-block loopb :test-block testb :pre-block preb)
 		  (let ((setloopb (mapcar (lambda (n) (select-instrs n)) (if (listp loopb) loopb (list loopb))))
 			(settestb (mapcar (lambda (n) (select-instrs n)) (if (listp testb) testb (list testb))))
@@ -186,7 +186,7 @@
 			  setloopb
 			  (make-block-py :name "test:")
 			  settestb)))
-		
+		 
 		 ((py-cmp :lexp e1 :cmp compare :rexp e2)
 		  (cond ((equalp "==" (string-upcase compare))
 			 (list (make-instruction :name "movq"
@@ -254,20 +254,20 @@
              (match in
                ((instruction :name name :arg1 a1 :arg2 a2)
                 (cond 
-                 ((and (immediate-p a1) (stringp a2))
-                  (concatenate 'string (string #\Tab) name " " 
-                               (write-to-string (immediate-int a1)) ", " 
-                               a2 (string #\Newline)))
-      
-                 ((and (stringp a1) (stringp a2))
-                  (concatenate 'string (string #\Tab) name " " 
-                               a1 ", " a2 (string #\Newline)))
-                 
-                 ((and (equalp name "jl") (stringp a1))
-                  (concatenate 'string (string #\Tab) "jl " 
-                               a1 (string #\Newline)))
-                 
-                 (t 
-                  (error "Unsupported instruction format: ~A" in)))))))
+                  ((and (immediate-p a1) (stringp a2))
+                   (concatenate 'string (string #\Tab) name " " 
+				(write-to-string (immediate-int a1)) ", " 
+				a2 (string #\Newline)))
+		  
+                  ((and (stringp a1) (stringp a2))
+                   (concatenate 'string (string #\Tab) name " " 
+				a1 ", " a2 (string #\Newline)))
+                  
+                  ((and (equalp name "jl") (stringp a1))
+                   (concatenate 'string (string #\Tab) "jl " 
+				a1 (string #\Newline)))
+                  
+                  (t 
+                   (error "Unsupported instruction format: ~A" in)))))))
     
     (apply #'concatenate 'string (mapcar #'toassembly instructions))))
