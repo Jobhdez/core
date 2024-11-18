@@ -125,7 +125,8 @@
 					      :arg2 'no-arg))))))
 		 ((py-print :exp e1)
 		  (if (or (py-var-p e1) (atomic-var-p e1))
-		      (list (make-callq :label "print_int"))))
+		      (list (make-instruction :name "movq" :arg1 (py-var-name e1) :arg2 "%rdi")
+			    (make-callq :label "print_int"))))
 
 
 		 ((atomic-sum :lexp e1 :rexp e2)
@@ -143,7 +144,8 @@
 		    (let ((body (gethash blk1 blks)))
 		      (let ((cmp (py-cmp-cmp cnd)))
 			(cond ((equalp "<" (string-upcase cmp))
-			       (list (mapcar (lambda (e) (select-instrs e)) body)
+			       (list (make-block-py :name blk1)
+				     (mapcar (lambda (e) (select-instrs e)) body)
 				     (make-instruction :name "cmpq" :arg1 (make-immediate :int (py-cmp-rexp cnd)) :arg2 (make-atomic-var :name (py-var-name (py-cmp-lexp cnd))))
 				     (make-instruction :name "jl" :arg1 blk1 :arg2 'no-arg)))
 			      (t
@@ -255,7 +257,7 @@
                ((instruction :name name :arg1 a1 :arg2 a2)
                 (cond 
                   ((and (immediate-p a1) (stringp a2))
-                   (concatenate 'string (string #\Tab) name " " 
+                   (concatenate 'string (string #\Tab) name " " "$"
 				(write-to-string (immediate-int a1)) ", " 
 				a2 (string #\Newline)))
 		  
@@ -268,6 +270,10 @@
 				a1 (string #\Newline)))
                   
                   (t 
-                   (error "Unsupported instruction format: ~A" in)))))))
+                   (error "Unsupported instruction format: ~A" in))))
+	       ((block-py :name name)
+		(concatenate 'string name ":" (string #\Newline)))
+	       ((callq :label fn)
+		(concatenate 'string (string #\Tab) "callq " fn (string #\Newline))))))
     
     (apply #'concatenate 'string (mapcar #'toassembly instructions))))
