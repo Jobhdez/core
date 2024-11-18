@@ -248,7 +248,6 @@
 					       "retq")))
 		  (concatenate 'string prelude assembly conclusion))))))))))
 
-
-
-
-
+(defun compile-code (exp filename)
+  (with-open-file (str filename :direction :output :if-exists :supersede :if-does-not-exist :create)
+    (format str (ast->x86 (select exp)))))
