@@ -148,7 +148,9 @@
 		  instr)
 		 ((callq :label lbl)
 		  instr))))
-      (flatten (mapcar (lambda (instr) (assignh  instr))  instructions)))))		     
+      (let ((instrs (flatten (mapcar (lambda (instr) (assignh  instr))  instructions))))
+	(list *variable* instrs)))))
+
 
 
 (defun clean (ast)
@@ -203,3 +205,50 @@
 
 (defun without-last (lst)
   (reverse (cdr (reverse lst))))
+
+(defun ast->x86 (ins)
+  (let ((cins (clean ins)))
+    (let ((ins* (assign-homes cins)))
+      (let ((stack (car ins*)))
+	(let ((instructions (car (cdr ins*))))
+	  (let ((stack* (if (equalp (mod stack 16) 0) stack (+ stack 8))))
+	    (let ((assembly (ast->assembly instructions)))
+	      (let ((prelude (concatenate 'string
+					  (string #\Tab)
+					  ".globl main"
+					  (string #\Newline)
+					  "main:"
+					  (string #\Newline)
+					  (string #\Tab)
+					  "pushq %rbp"
+					  (string #\Newline)
+					  (string #\Tab)
+					  "movq %rsp, %rbp"
+					  (string #\Newline)
+					  (string #\Tab)
+					  "subq $"
+					  (write-to-string stack*)
+					  ", "
+					  "%rsp"
+					  (string #\Newline))))
+		(let ((conclusion (concatenate 'string
+					       (string #\Newline)
+					       "conclusion:"
+					       (string #\Newline)
+					       (string #\Tab)
+					       "addq $"
+					       (write-to-string stack*)
+					       ", "
+					       "%rsp"
+					       (string #\Newline)
+					       (string #\Tab)
+					       "popq %rbp"
+					       (string #\Newline)
+					       (string #\Tab)
+					       "retq")))
+		  (concatenate 'string prelude assembly conclusion))))))))))
+
+
+
+
+
