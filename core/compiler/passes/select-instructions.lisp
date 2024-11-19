@@ -108,6 +108,12 @@
 			       (make-instruction :name "addq"
 						 :arg1 (atomic-sum-rexp n)
 						 :arg2 tmp)))
+			((py-cmp-p n)
+			 (if (and (py-var-p (py-cmp-lexp n))
+				  (py-constant-p (py-cmp-rexp n)))
+			     (list (make-instruction :name "cmpq" :arg1 (make-immediate :int (py-constant-num (py-cmp-rexp n))) :arg2 (make-atomic-var :name (py-var-name (py-cmp-lexp n))))
+				   (make-instruction :name "setl" :arg1 "%al" :arg2 'no-arg)
+				   (make-instruction :name "movzbq" :arg1 "%al" :arg2 (make-atomic-var :name tmp)))))
 			
 			
 			((py-neg-num-p n)
@@ -159,24 +165,15 @@
 			(blk2 (goto-block els)))
 		    (let* ((exp-thn (gethash blk1 blks))
 			   (exp-els (gethash blk2 blks)))
-		      (let ((cmp (py-cmp-cmp cnd)))
-			(cond ((equalp "<" (string-upcase cmp))
-			       (list (make-instruction :name "cmpq" :arg1 (make-immediate :int (py-cmp-rexp cnd)) :arg2 (make-immediate :int (py-cmp-lexp cnd)))
-				     (make-instruction :name "jl" :arg1 blk1 :arg2 'no-arg)
-				     (make-instruction :name "jmp" :arg1 blk2 :arg2 'no-arg)
-				     (make-block-py :name blk1)
-				     (if (listp exp-thn) (mapcar (lambda (e) (select-instrs e)) exp-thn) (select-instrs exp-thn))
-				     (make-block-py :name blk2)
-				     (if (listp exp-els) (mapcar (lambda (e) (select-instrs e)) exp-els) (select-instrs exp-els))))
-			      (t
-			       (list (make-instruction :name "cmpq" :arg1 (make-immediate :int (py-cmp-rexp cnd)) :arg2 (make-immediate :int (py-cmp-lexp cnd)))
-				     (make-instruction :name "jg" :arg1 blk1 :arg2 'no-arg)
-				     (make-instruction :name "jmp" :arg1 blk2 :arg2 'no-arg)
-				     (make-block-py :name blk1)
-				     (if (listp exp-thn) (mapcar (lambda (e) (select-instrs e)) exp-thn) (select-instrs exp-thn))
-				     (make-block-py :name blk2)
-				     (if (listp exp-els) (mapcar (lambda (e) (select-instrs e)) exp-els) (select-instrs exp-els)))))))))
-		 
+		      (list (make-instruction :name "cmpq" :arg1 (make-immediate :int 1) :arg2 cnd)
+			    (make-instruction :name "je" :arg1 blk1 :arg2 'no-arg)
+			    (make-instruction :name "jmp" :arg1 blk2 :arg2 'no-arg)
+			    (make-block-py :name blk1)
+			    (if (listp exp-thn) (mapcar (lambda (e) (select-instrs e)) exp-thn) (select-instrs exp-thn))
+			    (make-instruction :name "jmp" :arg1 "conclusion" :arg2 'no-arg)
+			    (make-block-py :name blk2)
+			    (if (listp exp-els) (mapcar (lambda (e) (select-instrs e)) exp-els) (select-instrs exp-els))
+			    (make-instruction :name "jmp" :arg1 "conclusion" :arg2 'no-arg)))))
 		 ((while-atomic :loop-block loopb :test-block testb :pre-block preb)
 		  (let ((setloopb (mapcar (lambda (n) (select-instrs n)) (if (listp loopb) loopb (list loopb))))
 			(settestb (mapcar (lambda (n) (select-instrs n)) (if (listp testb) testb (list testb))))
@@ -268,6 +265,14 @@
                   ((and (equalp name "jl") (stringp a1))
                    (concatenate 'string (string #\Tab) "jl " 
 				a1 (string #\Newline)))
+		  ((and (equalp name "je") (stringp a1))
+                   (concatenate 'string (string #\Tab) "je " 
+				a1 (string #\Newline)))
+		  ((and (equalp name "jmp") (stringp a1))
+                   (concatenate 'string (string #\Tab) "jmp " 
+				a1 (string #\Newline)))
+		  ((equalp name "setl")
+		   (concatenate 'string (string #\Tab) name " " a1 (string #\Newline)))
                   
                   (t 
                    (error "Unsupported instruction format: ~A" in))))
