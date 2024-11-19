@@ -136,11 +136,11 @@
 				 (make-py-print :exp (make-atomic-var :name temp-name)))))
 
 			(t (error "No other print expressions."))))
-		 ((py-if :exp e :if-statement ifs :else-statement els)
-		  (make-if-atomic :thn (flatten (mapcar (lambda (instr) (remove-complex instr)) ifs))
-				  :els (flatten (mapcar (lambda (instr) (remove-complex instr)) els))
-			          :cnd e))
-
+		 ((py-if :exp e :if-statement thn :else-statement els)
+		  (if (py-cmp-p e)
+		      (let ((tmp (generate-temp-name "temp_")))
+			(flatten (list (make-atomic-assignment :temp-var tmp :n (remove-complex e))
+				       (make-if-atomic :thn (if (listp thn) (mapcar #'remove-complex thn) (remove-complex thn)) :els (if (listp els) (mapcar #'remove-complex  els) (remove-complex els)) :cnd (make-atomic-var :name tmp)))))))
 		 ((py-while :prestatements pres
 			    :exp e1
 			    :body-statements body)
